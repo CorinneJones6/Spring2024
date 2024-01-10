@@ -1,0 +1,31 @@
+#Default when running "make", which calls program
+all: program
+
+#Lists the prerequisites for "program" target, which are the object files
+program: Caps.o Clothing.o Pants.o main.o
+	c++ Caps.o Clothing.o Pants.o main.o -o program
+
+#builds .o object files from the listed source files, then compiles using 'c++ -c'
+Caps.o: Caps.cpp Caps.h
+	c++ -c Caps.cpp
+
+Clothing.o: Clothing.cpp Clothing.h
+	c++ -c Clothing.cpp
+
+Pants.o: Pants.cpp Pants.h
+	c++ -c Pants.cpp
+	
+main.o: main.cpp
+	c++ -c main.cpp
+	
+#defines a target for cleaning up the project
+.PHONY: clean
+
+#'make clean' will remove the executable and the .o files
+clean:
+	rm -rf *.o
+	rm program
+
+# 'make run' will run the executable
+run: program
+	./program
