@@ -316,7 +316,6 @@ bool testDrawMe(){
     
     draw_me();
     
-    // Open the file for reading
     FILE* myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1:CWarmupLab/MyPicture.txt", "r");
     if (myPic == NULL) {
         return false;
