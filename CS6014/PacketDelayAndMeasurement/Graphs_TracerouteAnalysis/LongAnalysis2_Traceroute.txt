@@ -1,0 +1,60 @@
+Hop Number: 1
+IP Address: (10.17.0.2)
+Times: 13.086 16.851 77.541
+Average Time: 35.826
+Hop Number: 2
+IP Address: (155.99.130.71)
+Times: 5.522 4.277 4.694
+Average Time: 4.831
+Hop Number: 3
+IP Address: (155.99.130.64)
+Times: 4.377 66.131 7.594
+Average Time: 26.033998
+Hop Number: 4
+IP Address: (199.104.93.34)
+Times: 5.473 5.075 5.59
+Average Time: 5.3793335
+Hop Number: 5
+IP Address: (199.104.93.21)
+Times: 5.521 6.988 139.994
+Average Time: 50.834335
+Hop Number: 6
+IP Address: (140.197.253.138)
+Times: 6.708 6.839 6.184
+Average Time: 6.577
+Hop Number: 7
+IP Address: (140.197.252.85)
+Times: 8.318 11.396 116.301
+Average Time: 45.338333
+Hop Number: 8
+IP Address: (140.197.252.43)
+Times: 13.652 124.441 8.47
+Average Time: 48.854336
+Hop Number: 9
+IP Address: (140.197.248.79)
+Times: 7.579 8.74 8.651
+Average Time: 8.323334
+Hop Number: 11
+IP Address: (68.87.170.65)
+Times: 7.949 8.667 8.138
+Average Time: 8.251332
+Hop Number: 12
+IP Address: (96.110.43.225)
+Times: 43.904 45.021 45.341
+Average Time: 44.755337
+Hop Number: 13
+IP Address: (96.110.33.130)
+Times: 44.79 44.517 44.743
+Average Time: 44.683334
+Hop Number: 14
+IP Address: (71.25.197.110)
+Times: 23.287 19.733 38.012
+Average Time: 27.010666
+Hop Number: 15
+IP Address: (172.68.2.2)
+Times: 38.012 46.260 63.823
+Average Time: 49.365
+Hop Number: 16
+IP Address: (141.193.213.10)
+Times: 19.215 20.264 17.786
+Average Time: 19.088333
