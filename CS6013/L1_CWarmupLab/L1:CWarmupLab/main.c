@@ -238,7 +238,7 @@ void draw_me()
     FILE *myPic;
     
     //dictates the path to store the result
-    myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1:CWarmupLab/MyPicture.txt", "w");
+    myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1_CWarmupLab/MyPicture.txt", "w");
     //print to the file
     fprintf(myPic, "  ^_^\n");
     fprintf(myPic, "(>'.'<)\n");
@@ -268,6 +268,15 @@ void draw_me()
      return actual==result;
  }
 
+bool testByteSort2() {
+    unsigned long minValue = 0;
+    unsigned long minSorted = byte_sort(minValue);
+    if (minSorted == 0){
+        return true;
+    }
+    return false;
+}
+
 bool testNibbleSort() {
     unsigned long hex = 0x0403deadbeef0201;
     unsigned long actual=0xfeeeddba43210000;
@@ -279,6 +288,15 @@ bool testNibbleSort() {
     printf("%lx\n", result);
     
     return actual==result;
+}
+
+bool testNibbleSort2() {
+    unsigned long minValue = 0;
+    unsigned long minSorted = nibble_sort(minValue);
+    if (minSorted == 0){
+        return true;
+    }
+    return false;
 }
 
 bool testNameListCreation(){
@@ -306,6 +324,10 @@ bool testNameListDeletion(){
     list=name_list();
     free_list(list);
     
+    if(list->val=='C'){
+        return false;
+    }
+    
     return true;
 }
 
@@ -316,7 +338,7 @@ bool testDrawMe(){
     
     draw_me();
     
-    FILE* myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1:CWarmupLab/MyPicture.txt", "r");
+    FILE* myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1_CWarmupLab/MyPicture.txt", "r");
     if (myPic == NULL) {
         return false;
     }
@@ -324,6 +346,148 @@ bool testDrawMe(){
     
     return strcmp(actual, result) == 0;
 }
+
+/*********************************************************************
+ *
+ * Lindsay Haslam's tests:
+ */
+ void testByteSort_LH() {
+    //Normal scenario.
+    unsigned long test_val1 = 0x0403deadbeef0201;
+    unsigned long expected1 = 0xefdebead04030201;
+    assert(byte_sort(test_val1) == expected1);
+
+    //All bytes are the same.
+    unsigned long test_val2 = 0x1111111111111111;
+    unsigned long expected2 = 0x1111111111111111;
+    assert(byte_sort(test_val2) == expected2);
+
+    //Obvious increasing order.
+    unsigned long test_val3 = 0x0102030405060708;
+    unsigned long expected3 = 0x0807060504030201;
+    assert(byte_sort(test_val3) == expected3);
+
+    //Already in decreasing order.
+    unsigned long test_val4 = 0x0807060504030201;
+    unsigned long expected4 = 0x0807060504030201;
+    assert(byte_sort(test_val4) == expected4);
+
+    printf("BYTE SORT: All tests passed.\n");
+}
+
+void testNibbleSort_LH(){
+
+        //Normal scenario
+        unsigned long test_val1 = 0x0403deadbeef0201;
+        unsigned long expected1 = 0xfeeeddba43210000;
+        assert(nibble_sort(test_val1) == expected1);
+
+        //All nibbles are the same.
+        unsigned long test_val2 = 0x1111111111111111;
+        unsigned long expected2 = 0x1111111111111111;
+        assert(nibble_sort(test_val2) == expected2);
+
+        //Increasing order of nibbles
+        unsigned long test_val3 = 0x0123456789abcdef;
+        unsigned long expected3 = 0xfedcba9876543210;
+        assert(nibble_sort(test_val3) == expected3);
+
+        //Already in decreasing order
+        unsigned long test_val4 = 0xfedcba9876543210;
+        unsigned long expected4 = 0xfedcba9876543210;
+        assert(nibble_sort(test_val4) == expected4);
+
+        printf("NIBBLE SORT: All tests passed.\n");
+    }
+
+/*********************************************************************
+ *
+ * Sarah Bateman's tests:
+ */
+//testing it will fill in extra 0's
+bool testByteSort2_SB() {
+    unsigned long result = byte_sort(0x05);
+    return result == 0x500000000000000;
+}
+//testing example given in instructions
+bool testNibbleSort1_SB() {
+    unsigned long result = nibble_sort(0x0403deadbeef0201);
+    return result == 0xfeeeddba43210000;
+}
+//testing if I give it an input that's already correct it won't change the order
+bool testNibbleSort2_SB() {
+    unsigned long result = nibble_sort(0xFEDCBA9876543210);
+    return result == 0xfedcba9876543210;
+}
+
+//testing letters in my name
+bool testNameList_SB() {
+    Elt *nameList = name_list();
+    //checking first letter
+    if(nameList->val != 'C'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking third letter
+    if(nameList->val != 'o'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking last letter
+    if(nameList->val != 'r'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking last letter
+    if(nameList->val != 'i'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking last letter
+    if(nameList->val != 'n'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking last letter
+    if(nameList->val != 'n'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking last letter
+    if(nameList->val != 'e'){
+      return false;
+    }
+    //moving pointer
+    nameList = nameList->link;
+    //checking after 'e' the result is null
+    if(nameList != NULL){
+      return false;
+    }
+    //if none of them failed then return true
+    return true;
+}
+
+//testing free_list works
+bool testFreeList_SB(){
+  //create a linkedlist with my name
+  Elt *nameList = name_list();
+  //call free list to clear it
+  free_list(nameList);
+  //check that the head doesn't have the original value anymore
+   if(nameList->val == 'C'){
+      return false;
+    }
+    else{
+      return true;
+    }
+}
+
 
 /*********************************************************************
  *
@@ -338,8 +502,42 @@ bool testDrawMe(){
 int main()
 {
     assert(testByteSort());
+    assert(testByteSort2());
     assert(testNibbleSort());
+    assert(testNibbleSort2()); 
     assert(testNameListCreation());
-    assert(testNameListDeletion()); //fix this, rn it is returning true
+    assert(testNameListDeletion());
     assert(testDrawMe());
+    
+    testByteSort_LH();
+    testNibbleSort_LH();
+    
+    
+     if (testByteSort2_SB()) {
+           printf("byte_sort passed - Test 2\n");
+     } else {
+         printf("byte_sort failed - Test 2.\n");
+     }
+     if (testNibbleSort1_SB()) {
+           printf("nibble_sort passed - Test 1\n");
+     } else {
+         printf("nibble_sort failed - Test 1.\n");
+     }
+     if (testNibbleSort2_SB()) {
+           printf("nibble_sort passed - Test 2\n");
+     } else {
+         printf("nibble_sort failed - Test 2.\n");
+     }
+     if (testNameList_SB()) {
+           printf("name_list passed \n");
+     } else {
+         printf("name_list failed \n");
+     }
+     if (testFreeList_SB()) {
+           printf("free_list passed \n");
+     } else {
+         printf("free_list failed \n");
+     }
+
+    
 }
