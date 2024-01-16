@@ -3,34 +3,27 @@
 #include <string>
 #include <cstdlib>
 
-bool doesContain(char** argv, int size, std::string s){
-  for(int i=0; i<size; i++){
-    if(argv[i] == s){
-      return true;
-    }
-  }
-  return false; 
-}
-
 void use_arguments(int argc, char **argv){
-  std::string helpTag = "--help"; 
+  std::string helpTag = "--help";
   std::string testTag = "--test";
-  int size = argc; 
-  bool canTest = true; 
+  int length = argc;
+  bool canTest = true;
 
-  if(argc > 1){
-    if (doesContain(argv, size, helpTag)){
+  for (int i=1; i<length; i++){
+    std::string s = argv[i];
+    
+    if(s==helpTag){
       std::cout << "You can use the following tags: " << std::endl;
       std::cout << "--help" << std::endl;
       std::cout << "--test" << std::endl;
-        exit(0); 
+        exit(0);
     }
-    else if(doesContain(argv, size, testTag)){
+    else if(s==testTag){
       if(canTest){
       std::cout << "Test passed! " << std::endl;
       canTest = false;
       }
-      if(!canTest){
+      else if(!canTest){
         std::cerr << "Already tested" << std::endl;
         exit(1);
       }
@@ -38,8 +31,5 @@ void use_arguments(int argc, char **argv){
     else {
       std::cout << "Invalid argument provided" << std::endl;
     }
-  }
-  else {
-    std::cout << "Invalid argument provided" << std::endl;
   }
 };
