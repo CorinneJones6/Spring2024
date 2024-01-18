@@ -9,13 +9,9 @@
 /* Begin PBXBuildFile section */
 		B602A75A2B572B4F00BC447C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A7592B572B4F00BC447C /* main.cpp */; };
 		B602A76F2B572BD400BC447C /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = B602A7632B572BD400BC447C /* Makefile */; };
-		B602A7772B5731E500BC447C /* Add.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A7752B5731E500BC447C /* Add.cpp */; };
 		B602A77A2B57325300BC447C /* cmdline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A7782B57325300BC447C /* cmdline.cpp */; };
-		B602A77D2B5732BD00BC447C /* Mult.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A77B2B5732BD00BC447C /* Mult.cpp */; };
-		B602A7802B5732FA00BC447C /* Num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A77E2B5732FA00BC447C /* Num.cpp */; };
 		B602A7852B57334900BC447C /* Expr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A7832B57334900BC447C /* Expr.cpp */; };
-		B602A78E2B57388600BC447C /* Tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A78C2B57388600BC447C /* Tests.cpp */; };
-		B602A7912B5864E200BC447C /* VarExpr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A78F2B5864E200BC447C /* VarExpr.cpp */; };
+		B602A7942B59AC6100BC447C /* Tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B602A7932B59AC6100BC447C /* Tests.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,20 +30,12 @@
 		B602A7562B572B4F00BC447C /* ExpressionClasses */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ExpressionClasses; sourceTree = BUILT_PRODUCTS_DIR; };
 		B602A7592B572B4F00BC447C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B602A7632B572BD400BC447C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		B602A7752B5731E500BC447C /* Add.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Add.cpp; sourceTree = "<group>"; };
-		B602A7762B5731E500BC447C /* Add.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Add.hpp; sourceTree = "<group>"; };
 		B602A7782B57325300BC447C /* cmdline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cmdline.cpp; sourceTree = "<group>"; };
 		B602A7792B57325300BC447C /* cmdline.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cmdline.hpp; sourceTree = "<group>"; };
-		B602A77B2B5732BD00BC447C /* Mult.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Mult.cpp; sourceTree = "<group>"; };
-		B602A77C2B5732BD00BC447C /* Mult.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Mult.hpp; sourceTree = "<group>"; };
-		B602A77E2B5732FA00BC447C /* Num.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Num.cpp; sourceTree = "<group>"; };
-		B602A77F2B5732FA00BC447C /* Num.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Num.hpp; sourceTree = "<group>"; };
 		B602A7832B57334900BC447C /* Expr.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Expr.cpp; sourceTree = "<group>"; };
 		B602A7842B57334900BC447C /* Expr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Expr.hpp; sourceTree = "<group>"; };
-		B602A78C2B57388600BC447C /* Tests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tests.cpp; sourceTree = "<group>"; };
-		B602A78D2B57388600BC447C /* Tests.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Tests.hpp; sourceTree = "<group>"; };
-		B602A78F2B5864E200BC447C /* VarExpr.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VarExpr.cpp; sourceTree = "<group>"; };
-		B602A7902B5864E200BC447C /* VarExpr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VarExpr.hpp; sourceTree = "<group>"; };
+		B602A7932B59AC6100BC447C /* Tests.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tests.cpp; sourceTree = "<group>"; };
+		B602A7962B59AEF800BC447C /* catch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = catch.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,22 +68,14 @@
 		B602A7582B572B4F00BC447C /* ExpressionClasses */ = {
 			isa = PBXGroup;
 			children = (
-				B602A7752B5731E500BC447C /* Add.cpp */,
-				B602A7762B5731E500BC447C /* Add.hpp */,
 				B602A7592B572B4F00BC447C /* main.cpp */,
 				B602A7782B57325300BC447C /* cmdline.cpp */,
 				B602A7792B57325300BC447C /* cmdline.hpp */,
-				B602A77B2B5732BD00BC447C /* Mult.cpp */,
-				B602A77C2B5732BD00BC447C /* Mult.hpp */,
+				B602A7962B59AEF800BC447C /* catch.h */,
+				B602A7932B59AC6100BC447C /* Tests.cpp */,
 				B602A7632B572BD400BC447C /* Makefile */,
 				B602A7832B57334900BC447C /* Expr.cpp */,
-				B602A78F2B5864E200BC447C /* VarExpr.cpp */,
-				B602A7902B5864E200BC447C /* VarExpr.hpp */,
 				B602A7842B57334900BC447C /* Expr.hpp */,
-				B602A77E2B5732FA00BC447C /* Num.cpp */,
-				B602A77F2B5732FA00BC447C /* Num.hpp */,
-				B602A78C2B57388600BC447C /* Tests.cpp */,
-				B602A78D2B57388600BC447C /* Tests.hpp */,
 			);
 			path = ExpressionClasses;
 			sourceTree = "<group>";
@@ -158,14 +138,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				B602A7852B57334900BC447C /* Expr.cpp in Sources */,
-				B602A7912B5864E200BC447C /* VarExpr.cpp in Sources */,
 				B602A76F2B572BD400BC447C /* Makefile in Sources */,
-				B602A7772B5731E500BC447C /* Add.cpp in Sources */,
-				B602A7802B5732FA00BC447C /* Num.cpp in Sources */,
 				B602A77A2B57325300BC447C /* cmdline.cpp in Sources */,
-				B602A78E2B57388600BC447C /* Tests.cpp in Sources */,
+				B602A7942B59AC6100BC447C /* Tests.cpp in Sources */,
 				B602A75A2B572B4F00BC447C /* main.cpp in Sources */,
-				B602A77D2B5732BD00BC447C /* Mult.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
