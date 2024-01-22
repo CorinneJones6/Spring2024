@@ -27,7 +27,7 @@ public class Main {
                     pingData.insertTime(time);
                 }
             }
-            
+
             pingData.calcMinTime();
             pingData.calcAvgQueueDelay();
             pingData.writePingDataToFile();
