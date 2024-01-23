@@ -7,6 +7,8 @@
 
 #include "Expr.hpp"
 
+//----------------------ADD----------------------//
+
 Add::Add(Expr* lhs, Expr* rhs) {
     this->lhs = lhs;
     this->rhs = rhs;
@@ -19,6 +21,13 @@ bool Add::equals(Expr* e) {
     }
     return this->lhs->equals(addPtr->lhs) && this->rhs->equals(addPtr->rhs);
 }
+
+int Add:: interp() {
+
+    return this->lhs->interp() + this->rhs->interp();
+}
+
+//----------------------MULT----------------------//
 
 Mult::Mult(Expr *lhs, Expr *rhs){
   this->lhs = lhs;
@@ -33,6 +42,13 @@ if(multPtr==nullptr){
   return this->lhs->equals(multPtr->lhs) && this->rhs->equals(multPtr->rhs);
 }
 
+int Mult:: interp() {
+    
+    return this->lhs->interp() * this->rhs->interp();
+
+}
+
+//----------------------NUM----------------------//
 
 Num::Num (int val){
   this->val = val;
@@ -46,6 +62,13 @@ bool Num::equals (Expr *e) {
   return this->val == numPtr->val;
 }
 
+int Num:: interp(){
+    
+    return this->val;
+}
+
+//----------------------VAR----------------------//
+
 Var::Var (string val){
   this->val = val;
 }
@@ -56,4 +79,11 @@ bool Var::equals (Expr *e) {
       return false; // 'e' is not a 'VarExpr' object
   }
   return this->val == varPtr->val;
+}
+
+int Var::interp(){
+    
+    throw std::runtime_error("Var cannot be converted to a number");
+    
+    return 0;
 }

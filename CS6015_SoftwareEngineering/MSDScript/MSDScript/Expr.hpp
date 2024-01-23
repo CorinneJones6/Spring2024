@@ -9,12 +9,14 @@
 
 #include <stdio.h>
 #include <string>
+#include <stdexcept>
 using namespace std;
 
 
 class Expr {
 public:
-  virtual bool equals (Expr *e)=0;
+    virtual bool equals (Expr *e)=0;
+    virtual int interp()=0;
 };
 
 
@@ -28,6 +30,8 @@ public:
 
     virtual bool equals(Expr* e);
     
+    virtual int interp();
+    
 };
 
 class Mult : public Expr {
@@ -38,6 +42,8 @@ public:
     Mult(Expr* lhs, Expr* rhs);
 
     virtual bool equals(Expr* e);
+    
+    virtual int interp();
 };
 
 class Num : public Expr {
@@ -47,6 +53,8 @@ public:
     Num(int val);
     
     virtual bool equals(Expr* e);
+    
+    virtual int interp();
     
 };
 
@@ -58,6 +66,8 @@ public:
     Var (string val);
     
     virtual bool equals(Expr* e);
+    
+    virtual int interp();
     
 };
 

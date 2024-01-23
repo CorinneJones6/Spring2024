@@ -27,7 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B602A7562B572B4F00BC447C /* ExpressionClasses */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ExpressionClasses; sourceTree = BUILT_PRODUCTS_DIR; };
+		B602A7562B572B4F00BC447C /* MSDScript */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MSDScript; sourceTree = BUILT_PRODUCTS_DIR; };
 		B602A7592B572B4F00BC447C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		B602A7632B572BD400BC447C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		B602A7782B57325300BC447C /* cmdline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cmdline.cpp; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 		B602A74D2B572B4F00BC447C = {
 			isa = PBXGroup;
 			children = (
-				B602A7582B572B4F00BC447C /* ExpressionClasses */,
+				B602A7582B572B4F00BC447C /* MSDScript */,
 				B602A7572B572B4F00BC447C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,12 +60,12 @@
 		B602A7572B572B4F00BC447C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B602A7562B572B4F00BC447C /* ExpressionClasses */,
+				B602A7562B572B4F00BC447C /* MSDScript */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B602A7582B572B4F00BC447C /* ExpressionClasses */ = {
+		B602A7582B572B4F00BC447C /* MSDScript */ = {
 			isa = PBXGroup;
 			children = (
 				B602A7592B572B4F00BC447C /* main.cpp */,
@@ -77,15 +77,15 @@
 				B602A7832B57334900BC447C /* Expr.cpp */,
 				B602A7842B57334900BC447C /* Expr.hpp */,
 			);
-			path = ExpressionClasses;
+			path = MSDScript;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B602A7552B572B4F00BC447C /* ExpressionClasses */ = {
+		B602A7552B572B4F00BC447C /* MSDScript */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B602A75D2B572B4F00BC447C /* Build configuration list for PBXNativeTarget "ExpressionClasses" */;
+			buildConfigurationList = B602A75D2B572B4F00BC447C /* Build configuration list for PBXNativeTarget "MSDScript" */;
 			buildPhases = (
 				B602A7522B572B4F00BC447C /* Sources */,
 				B602A7532B572B4F00BC447C /* Frameworks */,
@@ -95,9 +95,9 @@
 			);
 			dependencies = (
 			);
-			name = ExpressionClasses;
+			name = MSDScript;
 			productName = ExpressionClasses;
-			productReference = B602A7562B572B4F00BC447C /* ExpressionClasses */;
+			productReference = B602A7562B572B4F00BC447C /* MSDScript */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -114,7 +114,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B602A7512B572B4F00BC447C /* Build configuration list for PBXProject "ExpressionClasses" */;
+			buildConfigurationList = B602A7512B572B4F00BC447C /* Build configuration list for PBXProject "MSDScript" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -127,7 +127,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B602A7552B572B4F00BC447C /* ExpressionClasses */,
+				B602A7552B572B4F00BC447C /* MSDScript */,
 			);
 		};
 /* End PBXProject section */
@@ -276,7 +276,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B602A7512B572B4F00BC447C /* Build configuration list for PBXProject "ExpressionClasses" */ = {
+		B602A7512B572B4F00BC447C /* Build configuration list for PBXProject "MSDScript" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B602A75B2B572B4F00BC447C /* Debug */,
@@ -285,7 +285,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B602A75D2B572B4F00BC447C /* Build configuration list for PBXNativeTarget "ExpressionClasses" */ = {
+		B602A75D2B572B4F00BC447C /* Build configuration list for PBXNativeTarget "MSDScript" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B602A75E2B572B4F00BC447C /* Debug */,

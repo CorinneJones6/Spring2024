@@ -23,3 +23,7 @@ msdscript: $(OBJFILES)
 clean:
 	rm -rf *.o
 	rm -f msdscript
+	
+# 'make run' will run the executable
+run: msdscript
+	./msdscript
