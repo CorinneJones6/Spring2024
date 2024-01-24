@@ -34,6 +34,13 @@ TEST_CASE("testing Var equals"){
     CHECK( (new Var("x"))->equals(new Var("y")) == false );
     CHECK( (new Num(1))->equals(new Var("x")) == false );
     
+    
+//    CHECK ((new Var("x"))->has_variable()==true);
+//    CHECK ((new Var("1"))->has_variable()==false);
+//    CHECK ((new Var("123X"))->has_variable()==true);
+//    CHECK ((new Var("1234!"))->has_variable()==false);
+//    CHECK ((new Var("12x34"))->has_variable()==true);
+  
 }
 
 TEST_CASE("testing Expr Interp"){

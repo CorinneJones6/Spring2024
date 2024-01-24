@@ -13,5 +13,4 @@
 
 using namespace std;
 
-
 void use_arguments(int argc, char **argv); 

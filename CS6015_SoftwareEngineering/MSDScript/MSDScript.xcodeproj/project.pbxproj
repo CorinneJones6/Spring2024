@@ -68,12 +68,12 @@
 		B602A7582B572B4F00BC447C /* MSDScript */ = {
 			isa = PBXGroup;
 			children = (
+				B602A7632B572BD400BC447C /* Makefile */,
 				B602A7592B572B4F00BC447C /* main.cpp */,
 				B602A7782B57325300BC447C /* cmdline.cpp */,
 				B602A7792B57325300BC447C /* cmdline.hpp */,
 				B602A7962B59AEF800BC447C /* catch.h */,
 				B602A7932B59AC6100BC447C /* Tests.cpp */,
-				B602A7632B572BD400BC447C /* Makefile */,
 				B602A7832B57334900BC447C /* Expr.cpp */,
 				B602A7842B57334900BC447C /* Expr.hpp */,
 			);

@@ -17,8 +17,11 @@ class Expr {
 public:
     virtual bool equals (Expr *e)=0;
     virtual int interp()=0;
+    virtual bool has_variable()=0;
+    virtual Expr* subst(string s, Expr* e)=0;
 };
 
+//======================  ADD  ======================//
 
 class Add : public Expr {
     
@@ -32,7 +35,13 @@ public:
     
     virtual int interp();
     
+    virtual bool has_variable();
+    
+    virtual Expr* subst(string s, Expr* e);
+    
 };
+
+//======================  MULT  ======================//
 
 class Mult : public Expr {
 public:
@@ -44,7 +53,13 @@ public:
     virtual bool equals(Expr* e);
     
     virtual int interp();
+    
+    virtual bool has_variable();
+    
+    virtual Expr* subst(string s, Expr* e);
 };
+
+//======================  NUM  ======================//
 
 class Num : public Expr {
 public:
@@ -55,6 +70,10 @@ public:
     virtual bool equals(Expr* e);
     
     virtual int interp();
+    
+    virtual bool has_variable();
+    
+    virtual Expr* subst(string s, Expr* e);
     
 };
 
@@ -68,6 +87,10 @@ public:
     virtual bool equals(Expr* e);
     
     virtual int interp();
+    
+    virtual bool has_variable();
+    
+    virtual Expr* subst(string s, Expr* e); 
     
 };
 
