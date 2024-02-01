@@ -19,7 +19,8 @@ import java.io.*;
  */
 
 public class DNSHeader {
-    private int id_;
+    private short id_;
+    private short flags_;
     private boolean qr_;
     private int opCode_;
     private boolean aa_;
@@ -36,8 +37,9 @@ public class DNSHeader {
     DNSHeader(){
 
     }
-    private DNSHeader(int id, boolean qr, int opCode, boolean aa, boolean tc, boolean rd, boolean ra, int z, int rCode, short qdCount, short anCount, short nsCount, short arCount) {
+    private DNSHeader(short id, short flags, boolean qr, int opCode, boolean aa, boolean tc, boolean rd, boolean ra, int z, int rCode, short qdCount, short anCount, short nsCount, short arCount) {
         id_ = id;
+        flags_=flags;
         qr_ = qr;
         opCode_ = opCode;
         aa_ = aa;
@@ -53,21 +55,25 @@ public class DNSHeader {
     }
     static DNSHeader decodeHeader(ByteArrayInputStream is) throws IOException {
         DataInputStream inputStream = new DataInputStream(is);
-        int id = inputStream.readShort();
+        short id = inputStream.readShort();
+
 
         //========== Pull info from flags ==========//
-        short flags = inputStream.readByte();
-        boolean qr = ((flags & 0b10000000) >>> 7) == 1;
-        int opCode = (flags & 0b01111000) >>> 3;
-        boolean aa = ((flags & 0b00000100) >>> 2) == 1;
-        boolean tc = ((flags & 0b00000010) >>> 1) == 1;
-        boolean rd = (flags & 0b00000001)==1;
+        byte flag1 = inputStream.readByte();
+        boolean qr = ((flag1 & 0b10000000) >>> 7) == 1;
+        int opCode = (flag1 & 0b01111000) >>> 3;
+        boolean aa = ((flag1 & 0b00000100) >>> 2) == 1;
+        boolean tc = ((flag1 & 0b00000010) >>> 1) == 1;
+        boolean rd = (flag1 & 0b00000001) == 1;
 
         //========== Pull info from flags ==========//
-        flags = inputStream.readByte();
-        boolean ra = ((flags & 0b10000000) >>> 7) == 1;
-        int z = (flags & 0b01110000) >>> 4;
-        int rCode = (flags & 0b00001111);
+        byte flag2 = inputStream.readByte();
+        boolean ra = ((flag2 & 0b10000000) >>> 7) == 1;
+        int z = (flag2 & 0b01110000) >>> 4;
+        int rCode = (flag2 & 0b00001111);
+
+        //========== Combine flag 1 and flag 2 into one short flags ==========//
+        short flags = (short)((flag1 << 8) | (flag2 & (0b11111111)));
 
         //========== Read in qdCount, anCount, nsCount, and arCount ==========//
         short qdCount = inputStream.readShort();
@@ -75,32 +81,59 @@ public class DNSHeader {
         short nsCount = inputStream.readShort();
         short arCount = inputStream.readShort();
 
-        return new DNSHeader(id, qr, opCode, aa, tc, rd, ra, z, rCode, qdCount, anCount, nsCount, arCount);
+        return new DNSHeader(id, flags, qr, opCode, aa, tc, rd, ra, z, rCode, qdCount, anCount, nsCount, arCount);
     }
 
     static DNSHeader buildHeaderForResponse(DNSMessage request, DNSMessage response) {
-        //todo: implement this function
-        return new DNSHeader();
+        DNSHeader dnsHeader = request.getHeader_();
+
+        //set qr and anCount to 1 for a response
+        dnsHeader.qr_ = true;
+        dnsHeader.anCount_ = 1;
+
+        return dnsHeader;
     }
-    void writeBytes(OutputStream os){
-        //todo: implement this function
+
+    void writeBytes(OutputStream os) throws IOException {
+        DataOutputStream dos = new DataOutputStream(os);
+        dos.writeShort(id_);
+        dos.writeShort(flags_);
+        dos.writeShort(qdCount_);
+        dos.writeShort(anCount_);
+        dos.writeShort(nsCount_);
+        dos.writeShort(arCount_);
     }
 
     public String toString(){
-        return "DNS Header={ " +
-                "id: " + id_ +
-                "qr: " + qr_ +
-                "opCode: " + opCode_ +
-                "aa: " + aa_ +
-                "tc: " + tc_ +
-                "rd: " + rd_ +
-                "ra: " + ra_ +
-                "z: " + z_ +
-                "rCode: " + rCode_ +
-                "qdCount: " + qdCount_ +
-                "anCount: " + anCount_ +
-                "nsCount: " + nsCount_ +
-                "arCount_: " + arCount_;
+        //Print out everything in a nice way.
+        return "DNSHeader {" +
+                "\n  transactionID=" + id_ +
+                ",\n  flags=" + flags_ +
+                " (qr=" + qr_ +
+                ", opCode=" + opCode_ +
+                ", aa=" + aa_ +
+                ", tc=" + tc_ +
+                ", rd=" + rd_ +
+                ", ra=" + ra_ +
+                ", z=" + z_ +
+                ", rCode=" + rCode_ + ")" +
+                ",\n  questions=" + qdCount_ +
+                ",\n  answerRRs=" + anCount_ +
+                ",\n  authorityRRs=" + nsCount_ +
+                ",\n  additionalRRs=" + arCount_ +
+                "\n}";
     }
 
+    public short getQdCount_() {
+        return qdCount_;
+    }
+    public short getAnCount_() {
+        return anCount_;
+    }
+    public short getNsCount_() {
+        return nsCount_;
+    }
+    public short getArCount_() {
+        return arCount_;
+    }
 }

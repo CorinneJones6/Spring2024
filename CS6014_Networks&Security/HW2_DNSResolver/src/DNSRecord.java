@@ -1,7 +1,5 @@
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -27,32 +25,31 @@ import java.util.HashMap;
 */
 public class DNSRecord {
 
-    String name_;
+    String[] name_;
     short type_;
     short class_;
-    int ttl_;
+    long ttl_;
     int rdLength_;
     byte[] rdata_;
-    Date date_;
+    Date createdDate_;
 
     DNSRecord(){
 
     }
-    DNSRecord(String name, short type, short c_, int ttl, int rdLength, byte[] rdata, Date date){
+    DNSRecord(String[] name, short type, short c_, int ttl, int rdLength, byte[] rdata, Date date){
         name_ = name;
         type_ = type;
         class_ = c_;
         ttl_ = ttl;
         rdLength_ = rdLength;
         rdata_ = rdata;
-        date_=date;
+        createdDate_ =date;
     }
 
     static DNSRecord decodeRecord(InputStream is, DNSMessage dnsMessage) throws IOException {
         DataInputStream inputStream = new DataInputStream(is);
 
-        String name = "";
-        //todo: use dnsMessage to read in the name????
+        String[] name = dnsMessage.readDomainName(is);
 
         short type = inputStream.readShort();
         short class_ = inputStream.readShort();
@@ -66,18 +63,36 @@ public class DNSRecord {
 
         return new DNSRecord(name, type, class_, ttl, rdLength, rdata, date);
     }
-    public void writeBytes (ByteArrayOutputStream ob, HashMap<String, Integer> hm) {
-        //todo: implement this function
+    public void writeBytes (ByteArrayOutputStream byteArrayOutputStream, HashMap<String, Integer> domainNameLocations) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        DNSMessage.writeDomainName(byteArrayOutputStream, domainNameLocations, name_);
+
+        dataOutputStream.writeShort(type_);
+        dataOutputStream.writeShort(class_);
+        dataOutputStream.writeLong(ttl_);
+        dataOutputStream.writeShort(rdLength_);
+        dataOutputStream.write(rdata_);
     }
     public String toString(){
-        //todo: implement this function
-        return "";
+        return "DNS Record={" +
+                "name: " + Arrays.toString(name_) +
+                "type: " + type_ +
+                "class: " + class_ +
+                "ttl: " + ttl_ +
+                "rdLength: " + rdLength_ +
+                "rdata: " + Arrays.toString(rdata_) +
+                "Date: " + createdDate_;
     }
 
     boolean isExpired(){
-        //todo: implement this function
-        return false;
-    }
+        Date date = new Date();
 
+        long currentTime = date.getTime();
+
+        long expirationTime = createdDate_.getTime()+ (ttl_*1000);
+
+        return currentTime>expirationTime;
+    }
 
 }

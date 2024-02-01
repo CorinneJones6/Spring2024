@@ -1,9 +1,8 @@
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 /*                                  1  1  1  1  1  1
       0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
@@ -20,41 +19,57 @@ import java.util.HashMap;
 
 public class DNSQuestion {
 
-    private String qName_;
+    private String[] qName_;
     private short qType_;
     private short qClass_;
 
     DNSQuestion() {
 
     }
-    DNSQuestion(String qName, short qType, short qClass){
+    DNSQuestion(String[] qName, short qType, short qClass){
         qName_ = qName;
         qType_ = qType;
         qClass_ = qClass;
     }
 
     static DNSQuestion decodeQuestion(InputStream is, DNSMessage dnsMessage) throws IOException {
-        DataInputStream inputStream = new DataInputStream(is);
-        String qName = "";
-        int len;
 
-        //todo: maybe??? use dnsMessage to extract the qName???
-        while( (len = inputStream.readByte()) > 0) {
-            byte[] record = new byte[len];
-            for(int i=0; i<len; i++){
-                record[i] = inputStream.readByte();
-            }
-            qName = new String (record, StandardCharsets.UTF_8);
-        }
+        DataInputStream inputStream = new DataInputStream(is);
+
+        String[] qName = dnsMessage.readDomainName(is);
         short qType = inputStream.readShort();
         short qClass = inputStream.readShort();
 
         return new DNSQuestion(qName, qType, qClass);
     }
 
-    void writeBytes(ByteArrayOutputStream bo, HashMap<String,Integer> domainNameLocations){
-        //todo: implement this function
+    void writeBytes(ByteArrayOutputStream bo, HashMap<String,Integer> domainNameLocations) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(bo);
+        DNSMessage.writeDomainName(bo, domainNameLocations, qName_);
+
+        dataOutputStream.writeShort(qType_);
+        dataOutputStream.writeShort(qClass_);
     }
 
-//    toString(), equals(), and hashCode()
+    @Override
+    public String toString() {
+        return "DNSQuestion{" +
+                "qName_='" + Arrays.toString(qName_) + '\'' +
+                ", qType_=" + qType_ +
+                ", qClass_=" + qClass_ +
+                '}';
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DNSQuestion that = (DNSQuestion) o;
+        return qType_ == that.qType_ && qClass_ == that.qClass_ && Arrays.equals(qName_, that.qName_);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.hashCode(qName_), qType_, qClass_);
+    }
+
 }
