@@ -34,20 +34,17 @@ public class DNSServer {
                 if (record != null) {
                     //handle the request here
                 } else {
-                    DatagramSocket googleSocket = new DatagramSocket();
-
                     InetAddress googleDNS = InetAddress.getByName("8.8.8.8");
-                    DatagramPacket forwardPacket = new DatagramPacket(buffer, buffer.length, googleDNS, 53);
-                    socket.send(forwardPacket);
-
+                    DatagramPacket forwardGooglePkt = new DatagramPacket(buffer, buffer.length, googleDNS, 53);
+                    socket.send(forwardGooglePkt);
 
                     byte[] responseBuffer = new byte[1024]; // Create a separate buffer for receiving the response
                     // Receive response from Google DNS
-                    DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
-                    socket.receive(responsePacket);
-
+                    DatagramPacket responseGooglePkt = new DatagramPacket(responseBuffer, responseBuffer.length);
+                    socket.receive(responseGooglePkt);
+                    
                     // Decode response from Google DNS
-                    DNSMessage googleResponse = DNSMessage.decodeMessage(responsePacket.getData());
+                    DNSMessage googleResponse = DNSMessage.decodeMessage(responseGooglePkt.getData());
 
                     // Add answers to cache
                     for (DNSRecord answer : googleResponse.getAnswer_()) {
@@ -56,8 +53,6 @@ public class DNSServer {
                     // Add answers to response
                     googleResponse.getAnswer_().addAll(googleResponse.getAnswer_());
 
-                    // Close the forwarding socket
-                    googleSocket.close();
                 }
             }
 
