@@ -1,73 +1,58 @@
-import javax.xml.crypto.Data;
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class DNSServer {
+    private static final int DNS_SERVER_PORT = 8053;
+    private static final DNSCache DNS_CACHE = new DNSCache();
+
+    static DNSMessage sendDnsRequestToGoogle(DatagramSocket socket, byte[] buffer, DNSQuestion question) throws IOException {
+        InetAddress googleDNS = InetAddress.getByName("8.8.8.8");
+        DatagramPacket requestPkt = new DatagramPacket(buffer, buffer.length, googleDNS, 53);
+        socket.send(requestPkt);
+
+        byte[] responseBuffer = new byte[1024]; // Create a separate buffer for receiving the response
+        DatagramPacket responsePkt = new DatagramPacket(responseBuffer, responseBuffer.length);
+        socket.receive(responsePkt);
+        System.out.println("Received: " + responsePkt);
+
+        DNSMessage response = DNSMessage.decodeMessage(responsePkt.getData());
+
+        for(DNSRecord answer : response.getAnswer_()){
+            DNSCache.insertRecord(question, answer);
+        }
+        return response;
+    }
+
     public static void main(String[] args) throws IOException {
 
-        int server_port = 8053;
-        System.out.println("Listening at " + server_port);
+        DatagramSocket socket = new DatagramSocket(DNS_SERVER_PORT);
+//        DatagramSocket googleSocket = new DatagramSocket();
 
-        DatagramSocket socket = new DatagramSocket(server_port);
-
-
-        for (int count = 1; true; count++) {
+        while (true) {
             byte[] buffer = new byte[1024];
             DatagramPacket pkt = new DatagramPacket(buffer, buffer.length);
             socket.receive(pkt);
-            DNSMessage requestMessage = DNSMessage.decodeMessage(pkt.getData());
 
-            DNSHeader header = requestMessage.getHeader_();
-            String headStr = header.toString();
+            DNSMessage request = DNSMessage.decodeMessage(pkt.getData());
+            DNSMessage response = new DNSMessage();
 
-            System.out.println(headStr);
-
-            ArrayList<DNSQuestion> questions = requestMessage.getQuestion_();
-
-            DNSCache cache = new DNSCache();
-
-            for (DNSQuestion question : questions) {
-                DNSRecord record = cache.queryRecord(question);
-                if (record != null) {
-                    //handle the request here
-                } else {
-                    InetAddress googleDNS = InetAddress.getByName("8.8.8.8");
-                    DatagramPacket forwardGooglePkt = new DatagramPacket(buffer, buffer.length, googleDNS, 53);
-                    socket.send(forwardGooglePkt);
-
-                    byte[] responseBuffer = new byte[1024]; // Create a separate buffer for receiving the response
-                    // Receive response from Google DNS
-                    DatagramPacket responseGooglePkt = new DatagramPacket(responseBuffer, responseBuffer.length);
-                    socket.receive(responseGooglePkt);
+            for (DNSQuestion question : request.getQuestion_()) {
+                DNSRecord record = DNSCache.queryRecord(question);
+                if (DNS_CACHE.isCached(question)) {
+                    ArrayList<DNSRecord> arr = new ArrayList<>();
+                    arr.add(record);
+                    response = DNSMessage.buildResponse(request, arr);
                     
-                    // Decode response from Google DNS
-                    DNSMessage googleResponse = DNSMessage.decodeMessage(responseGooglePkt.getData());
-
-                    // Add answers to cache
-                    for (DNSRecord answer : googleResponse.getAnswer_()) {
-                        cache.insertRecord(question, answer);
-                    }
-                    // Add answers to response
-                    googleResponse.getAnswer_().addAll(googleResponse.getAnswer_());
-
+                } else {
+                    response = sendDnsRequestToGoogle(socket, buffer, question);
                 }
             }
-
-
-
-
-
-//            System.out.println(count + " Heard from " + pkt.getAddress() + " " + pkt.getPort());
-//            for (int i = 0; i < pkt.getLength(); i++) {
-//                System.out.printf(" %x", (int) buffer[i] & 0xFF);
-//            }
-//            System.out.println("\n");
+            byte[] responseData = response.toBytes();
+            DatagramPacket responsePacket = new DatagramPacket(responseData, responseData.length, pkt.getAddress(), pkt.getPort());
+            socket.send(responsePacket);
         }
-
     }
-
-
 }

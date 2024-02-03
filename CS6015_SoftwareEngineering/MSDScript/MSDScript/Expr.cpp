@@ -6,6 +6,7 @@
 //
 
 #include "Expr.hpp"
+
 //====================== EXPR ======================//
 
 string Expr::to_string(){
@@ -28,8 +29,6 @@ string Expr::to_pretty_string(){
     return st.str();
 }
 
-
-
 //======================  ADD  ======================//
 
 Add::Add(Expr* lhs, Expr* rhs) {
@@ -46,7 +45,6 @@ bool Add::equals(Expr* e) {
 }
 
 int Add:: interp(){
-
     return this->lhs->interp() + this->rhs->interp();
 }
 
@@ -55,7 +53,6 @@ bool Add::has_variable(){
 }
 
 Expr* Add::subst(string str, Expr* e){
-   
     return new Add (this->lhs->subst(str, e), this->rhs->subst(str, e));
 }
 
@@ -80,7 +77,6 @@ void Add::pretty_print_at(ostream &ostream, precedence_t prec) {
     if(prec >= prec_add){
         ostream << ")";
     }
-    
 }
 
 //======================  MULT  ======================//
@@ -99,9 +95,7 @@ if(multPtr==nullptr){
 }
 
 int Mult:: interp() {
-    
     return this->lhs->interp() * this->rhs->interp();
-
 }
 
 bool Mult::has_variable() {
@@ -109,9 +103,7 @@ bool Mult::has_variable() {
 }
 
 Expr* Mult::subst(string str, Expr* e){
-    
     return new Mult (this->lhs->subst(str, e), this->rhs->subst(str, e));
-    
 }
 
 void Mult::print (ostream &ostream){
@@ -153,7 +145,6 @@ bool Num::equals (Expr *e) {
 }
 
 int Num:: interp(){
-    
     return this->val;
 }
 
@@ -169,7 +160,6 @@ void Num::print (ostream &ostream){
     ostream<<::to_string(val);
 }
 
-
 //======================  VAR  ======================//
 
 Var::Var (string val){
@@ -177,7 +167,7 @@ Var::Var (string val){
 }
 
 bool Var::equals (Expr *e) {
-    Var* varPtr = dynamic_cast<Var*>(e); // Check if 'e' is a 'VarExpr' object
+  Var* varPtr = dynamic_cast<Var*>(e); // Check if 'e' is a 'VarExpr' object
   if (varPtr == nullptr) {
       return false; // 'e' is not a 'VarExpr' object
   }
@@ -185,7 +175,6 @@ bool Var::equals (Expr *e) {
 }
 
 int Var::interp(){
-    
     throw std::runtime_error("Var cannot be converted to a number");
     
     return 1;

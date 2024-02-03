@@ -6,7 +6,7 @@
 //
 #pragma once
 
-#include<stdlib.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string>
 #include <stdexcept>
@@ -99,8 +99,6 @@ public:
     virtual Expr* subst(string str, Expr* e);
     
     virtual void print (ostream &ostream);
-    
-    string to_string(); 
     
 };
 

@@ -19,27 +19,16 @@ import java.io.*;
  */
 
 public class DNSHeader {
-    private short id_;
-    private short flags_;
-    private boolean qr_;
-    private int opCode_;
-    private boolean aa_;
-    private boolean tc_;
-    private boolean rd_;
-    private boolean ra_;
-    private int z_;
-    private int rCode_;
-    private short qdCount_;
-    private short anCount_;
-    private short nsCount_;
-    private short arCount_;
+    private int id_, qr_, opCode_, aa_, tc_, rd_, ra_, z_, rCode_, qdCount_, anCount_, nsCount_, arCount_;
+    byte flag1_, flag2_;
 
     DNSHeader(){
 
     }
-    private DNSHeader(short id, short flags, boolean qr, int opCode, boolean aa, boolean tc, boolean rd, boolean ra, int z, int rCode, short qdCount, short anCount, short nsCount, short arCount) {
+    private DNSHeader(int id, byte flag1, byte flag2, int qr, int opCode, int aa, int tc, int rd, int ra, int z, int rCode, int qdCount, int anCount, int nsCount, int arCount) {
         id_ = id;
-        flags_=flags;
+        flag1_=flag1;
+        flag2_=flag2;
         qr_ = qr;
         opCode_ = opCode;
         aa_ = aa;
@@ -55,40 +44,34 @@ public class DNSHeader {
     }
     static DNSHeader decodeHeader(ByteArrayInputStream is) throws IOException {
         DataInputStream inputStream = new DataInputStream(is);
-        short id = inputStream.readShort();
+        int id = inputStream.readShort();
 
-
-        //========== Pull info from flags ==========//
         byte flag1 = inputStream.readByte();
-        boolean qr = ((flag1 & 0b10000000) >>> 7) == 1;
-        int opCode = (flag1 & 0b01111000) >>> 3;
-        boolean aa = ((flag1 & 0b00000100) >>> 2) == 1;
-        boolean tc = ((flag1 & 0b00000010) >>> 1) == 1;
-        boolean rd = (flag1 & 0b00000001) == 1;
-
-        //========== Pull info from flags ==========//
         byte flag2 = inputStream.readByte();
-        boolean ra = ((flag2 & 0b10000000) >>> 7) == 1;
+
+        int qr = (flag1 & 0b10000000) >>> 7;
+        int opCode = (flag1 & 0b01111000) >>> 3;
+        int aa = (flag1 & 0b00000100) >>> 2;
+        int tc = (flag1 & 0b00000010) >>> 1;
+        int rd = flag1 & 0b00000001;
+
+        int ra = (flag2 & 0b10000000) >>> 7;
         int z = (flag2 & 0b01110000) >>> 4;
-        int rCode = (flag2 & 0b00001111);
+        int rCode = flag2 & 0b00001111;
 
-        //========== Combine flag 1 and flag 2 into one short flags ==========//
-        short flags = (short)((flag1 << 8) | (flag2 & (0b11111111)));
+        int qdCount = inputStream.readShort();
+        int anCount = inputStream.readShort();
+        int nsCount = inputStream.readShort();
+        int arCount = inputStream.readShort();
 
-        //========== Read in qdCount, anCount, nsCount, and arCount ==========//
-        short qdCount = inputStream.readShort();
-        short anCount = inputStream.readShort();
-        short nsCount = inputStream.readShort();
-        short arCount = inputStream.readShort();
-
-        return new DNSHeader(id, flags, qr, opCode, aa, tc, rd, ra, z, rCode, qdCount, anCount, nsCount, arCount);
+        return new DNSHeader(id, flag1, flag2, qr, opCode, aa, tc, rd, ra, z, rCode, qdCount, anCount, nsCount, arCount);
     }
 
-    static DNSHeader buildHeaderForResponse(DNSMessage request, DNSMessage response) {
+    static DNSHeader buildHeaderForResponse(DNSMessage request) {
         DNSHeader dnsHeader = request.getHeader_();
 
         //set qr and anCount to 1 for a response
-        dnsHeader.qr_ = true;
+        dnsHeader.qr_ = 1;
         dnsHeader.anCount_ = 1;
 
         return dnsHeader;
@@ -97,7 +80,8 @@ public class DNSHeader {
     void writeBytes(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
         dos.writeShort(id_);
-        dos.writeShort(flags_);
+        dos.writeByte(flag1_);
+        dos.writeByte(flag2_);
         dos.writeShort(qdCount_);
         dos.writeShort(anCount_);
         dos.writeShort(nsCount_);
@@ -108,7 +92,7 @@ public class DNSHeader {
         //Print out everything in a nice way.
         return "DNSHeader {" +
                 "\n  transactionID=" + id_ +
-                ",\n  flags=" + flags_ +
+                ",\n  flags=" +
                 " (qr=" + qr_ +
                 ", opCode=" + opCode_ +
                 ", aa=" + aa_ +
@@ -124,16 +108,18 @@ public class DNSHeader {
                 "\n}";
     }
 
-    public short getQdCount_() {
+    public int getId_(){return id_;}
+    public void setID_(int id){id_=id;}
+    public int getQdCount_() {
         return qdCount_;
     }
-    public short getAnCount_() {
+    public int getAnCount_() {
         return anCount_;
     }
-    public short getNsCount_() {
+    public int getNsCount_() {
         return nsCount_;
     }
-    public short getArCount_() {
+    public int getArCount_() {
         return arCount_;
     }
 }

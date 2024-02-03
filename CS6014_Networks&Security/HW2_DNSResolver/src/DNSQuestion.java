@@ -35,17 +35,18 @@ public class DNSQuestion {
     static DNSQuestion decodeQuestion(InputStream is, DNSMessage dnsMessage) throws IOException {
 
         DataInputStream inputStream = new DataInputStream(is);
-
-        String[] qName = dnsMessage.readDomainName(is);
+        String[] qName = DNSMessage.readDomainName(is);
         short qType = inputStream.readShort();
         short qClass = inputStream.readShort();
 
         return new DNSQuestion(qName, qType, qClass);
     }
 
-    void writeBytes(ByteArrayOutputStream bo, HashMap<String,Integer> domainNameLocations) throws IOException {
-        DataOutputStream dataOutputStream = new DataOutputStream(bo);
-        DNSMessage.writeDomainName(bo, domainNameLocations, qName_);
+    void writeBytes(ByteArrayOutputStream outputStream, HashMap<String, Integer> domainNameLocations) throws IOException {
+        DNSMessage.writeDomainName(outputStream, domainNameLocations, qName_);
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        // No more parts
+//        dataOutputStream.writeByte(0);
 
         dataOutputStream.writeShort(qType_);
         dataOutputStream.writeShort(qClass_);
@@ -54,7 +55,7 @@ public class DNSQuestion {
     @Override
     public String toString() {
         return "DNSQuestion{" +
-                "qName_='" + Arrays.toString(qName_) + '\'' +
+                "qName_='" + qName_ + '\'' +
                 ", qType_=" + qType_ +
                 ", qClass_=" + qClass_ +
                 '}';
@@ -64,12 +65,12 @@ public class DNSQuestion {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DNSQuestion that = (DNSQuestion) o;
-        return qType_ == that.qType_ && qClass_ == that.qClass_ && Arrays.equals(qName_, that.qName_);
+        return qType_ == that.qType_ && qClass_ == that.qClass_ && Objects.equals(qName_, that.qName_);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Arrays.hashCode(qName_), qType_, qClass_);
+        return Objects.hash(qName_, qType_, qClass_);
     }
 
 }

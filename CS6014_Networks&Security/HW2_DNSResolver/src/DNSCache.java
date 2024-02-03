@@ -2,21 +2,20 @@ import java.util.HashMap;
 
 public class DNSCache {
 
-    private HashMap<DNSQuestion, DNSRecord> cache;
+    private static HashMap<DNSQuestion, DNSRecord> cache;
 
     DNSCache(){
-        this.cache = new HashMap<>();
+        cache = new HashMap<>();
     }
 
-    //Handle inserting the record
-    public synchronized void insertRecord(DNSQuestion question, DNSRecord answer){
-//        DNSRecord.creationDate = new Date();
-        cache.put(question, answer);
+    public static synchronized void insertRecord(DNSQuestion question, DNSRecord message){
+        cache.put(question, message);
     }
-    public synchronized DNSRecord queryRecord(DNSQuestion question){
-//        checkAndCleanExpiredRecords();
-        //Return the record if it exists, null otherwise
-        return cache.getOrDefault(question, null);
+    public static synchronized DNSRecord queryRecord(DNSQuestion question){
+        return cache.getOrDefault(question, null); //Return record if exists, null otherwise
+    }
+    public synchronized boolean isCached(DNSQuestion question){
+        return cache.containsKey(question);
     }
 
 
