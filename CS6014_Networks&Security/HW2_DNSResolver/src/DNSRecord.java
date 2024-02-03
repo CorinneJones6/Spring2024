@@ -75,7 +75,7 @@ public class DNSRecord {
         }
 
         // Read and parse the record type, class, time-to-live (TTL), and record data length
-        if(name.length!=0) {
+        if (name.length != 0) {
             int type = dataInputStream.readShort();
             int c_ = dataInputStream.readShort();
             int ttl = dataInputStream.readInt();

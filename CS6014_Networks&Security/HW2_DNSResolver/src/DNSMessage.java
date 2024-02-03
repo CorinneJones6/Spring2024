@@ -42,8 +42,10 @@ public class DNSMessage {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
+        // Store the messageBytes for reference, if needed
         messageBytes = bytes;
-        //initialize member variables to avoid nullptr exceptions
+
+        // Initialize member variables of DNSMessage to avoid null pointer exceptions
         DNSMessage dnsMessage = new DNSMessage();
         dnsMessage.header_ = new DNSHeader();
         dnsMessage.questions_ = new ArrayList<>();
@@ -51,21 +53,26 @@ public class DNSMessage {
         dnsMessage.authorities_ = new ArrayList<>();
         dnsMessage.additionals_ = new ArrayList<>();
 
+        // Decode the DNSMessage header
         dnsMessage.header_ = DNSHeader.decodeHeader(byteArrayInputStream);
 
+        // Decode DNSQuestion objects based on the header's QDCount
         for (int i = 0; i < dnsMessage.header_.getQdCount_(); i++) {
             DNSQuestion question = (DNSQuestion.decodeQuestion(dataInputStream, dnsMessage));
             dnsMessage.questions_.add(question);
         }
 
+        // Decode DNSRecord objects from the answer section based on ANCount
         for (int i = 0; i < dnsMessage.header_.getAnCount_(); i++) {
             dnsMessage.answers_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
         }
 
+        // Decode DNSRecord objects from the authority section based on NSCount
         for (int i = 0; i < dnsMessage.header_.getNsCount_(); i++) {
             dnsMessage.authorities_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
         }
 
+        // Decode DNSRecord objects from the additional section based on ARCount
         for (int i = 0; i < dnsMessage.header_.getArCount_(); i++) {
             dnsMessage.additionals_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
         }
@@ -83,17 +90,31 @@ public class DNSMessage {
     public static String[] readDomainName(InputStream inputStream) throws IOException {
         List<String> domainLabels = new ArrayList<>();
         DataInputStream dataInputStream = new DataInputStream(inputStream);
+        // Read the length of the first label
         byte labelLength = dataInputStream.readByte();
+
+        // If the length is zero, return an empty array (root domain)
         if (labelLength == 0) {
             return new String[0];
         }
+
+        // Loop to read and decode labels until a zero-length label is encountered
         while (labelLength != 0) {
             byte[] buffer;
+
+            // Read the label bytes based on the length
             buffer = dataInputStream.readNBytes(labelLength);
-            String str = new String(buffer, StandardCharsets.UTF_8);
-            domainLabels.add(str);
+
+            // Convert the label bytes to a String using UTF-8 encoding
+            String label = new String(buffer, StandardCharsets.UTF_8);
+
+            // Add the decoded label to the list
+            domainLabels.add(label);
+
+            // Read the length of the next label
             labelLength = dataInputStream.readByte();
         }
+        // Convert the list of labels to an array and return it
         return domainLabels.toArray(new String[0]);
     }
 
@@ -134,21 +155,32 @@ public class DNSMessage {
      */
     public byte[] toBytes() throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        // Serialize the DNSMessage header and initialize the domainLocations map
         header_.writeBytes(byteArrayOutputStream);
         domainLocations_ = new HashMap<>();
 
+        // Serialize DNSQuestion objects and update domainLocations map
         for (DNSQuestion question : questions_) {
             question.writeBytes(byteArrayOutputStream, domainLocations_);
         }
+
+        // Serialize DNSRecord objects from the answer section
         for (DNSRecord answer : answers_) {
             answer.writeBytes(byteArrayOutputStream, domainLocations_);
         }
+
+        // Serialize DNSRecord objects from the authority section
         for (DNSRecord authority : authorities_) {
             authority.writeBytes(byteArrayOutputStream, domainLocations_);
         }
+
+        // Serialize DNSRecord objects from the additional section
         for (DNSRecord additional : additionals_) {
             additional.writeBytes(byteArrayOutputStream, domainLocations_);
         }
+
+        // Convert the ByteArrayOutputStream to a byte array and return it
         return byteArrayOutputStream.toByteArray();
     }
 
@@ -163,10 +195,9 @@ public class DNSMessage {
     static void writeDomainName(ByteArrayOutputStream byteArrayOutputStream, HashMap<String, Integer> domainLocations, String[] domainPieces) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(byteArrayOutputStream);
         String domainName = joinDomainName(domainPieces);
-        if( domainName.length() == 0){
+        if (domainName.length() == 0) {
             outputStream.writeByte(0);
-        }
-        else {
+        } else {
             // Write each label of the domain name along with their lengths
             for (String label : domainPieces) {
                 byte[] labelBytes = label.getBytes(StandardCharsets.UTF_8);

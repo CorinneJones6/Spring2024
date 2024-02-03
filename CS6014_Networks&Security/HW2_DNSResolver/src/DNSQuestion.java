@@ -69,6 +69,11 @@ public class DNSQuestion {
         dataOutputStream.writeShort(qClass_);
     }
 
+    /**
+     * Returns a string representation of the DNSQuestion object.
+     *
+     * @return A string containing the DNSQuestion's qName, qType, and qClass values.
+     */
     @Override
     public String toString() {
         return "DNSQuestion{" +
@@ -78,6 +83,12 @@ public class DNSQuestion {
                 '}';
     }
 
+    /**
+     * Compares this DNSQuestion object to another object for equality.
+     *
+     * @param o The object to compare to this DNSQuestion.
+     * @return true if the objects are equal, false otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,6 +97,11 @@ public class DNSQuestion {
         return qType_ == that.qType_ && qClass_ == that.qClass_ && Objects.equals(qName_, that.qName_);
     }
 
+    /**
+     * Computes a hash code for the DNSQuestion object.
+     *
+     * @return The hash code value for this DNSQuestion.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(qName_, qType_, qClass_);

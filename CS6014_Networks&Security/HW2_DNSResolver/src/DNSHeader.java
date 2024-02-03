@@ -101,8 +101,8 @@ public class DNSHeader {
     void writeBytes(OutputStream outputStream) throws IOException {
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
         dataOutputStream.writeShort(id_);
-        dataOutputStream.writeByte(flag1_);
-        dataOutputStream.writeByte(flag2_);
+        dataOutputStream.writeByte(flag1_); //send the whole flag so no reverse bit manipulation required
+        dataOutputStream.writeByte(flag2_); //send the whole flag so no reverse bit manipulation required
         dataOutputStream.writeShort(qdCount_);
         dataOutputStream.writeShort(anCount_);
         dataOutputStream.writeShort(nsCount_);
