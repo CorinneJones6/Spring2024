@@ -65,7 +65,7 @@ public class DNSRecord {
         if ((firstTwoBytes & 0xC0) == 0xC0) {
             // Handle compressed domain name with offset
             int offset = dataInputStream.readByte();
-//            int offset = firstTwoBytes & 0x3FFF;
+            // int offset = firstTwoBytes & 0x3FFF;
             name = dnsMessage.readDomainName(offset);
 
         } else {
@@ -139,7 +139,8 @@ public class DNSRecord {
         long currentTime = date.getTime();
 
         // Calculate the expiration time based on the creation date and TTL
-        long expirationTime = createdDate_.getTime() + (ttl_ * 1000); //multiply by 1000 to convert from seconds to milliseconds
+        // Multiply by 1000 to convert from seconds to milliseconds
+        long expirationTime = createdDate_.getTime() + (ttl_ * 1000);
 
         return currentTime > expirationTime;
     }

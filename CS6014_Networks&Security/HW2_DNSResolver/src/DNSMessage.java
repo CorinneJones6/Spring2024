@@ -195,7 +195,7 @@ public class DNSMessage {
     static void writeDomainName(ByteArrayOutputStream byteArrayOutputStream, HashMap<String, Integer> domainLocations, String[] domainPieces) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(byteArrayOutputStream);
         String domainName = joinDomainName(domainPieces);
-        if (domainName.length() == 0) {
+        if (domainName.isEmpty()) {
             outputStream.writeByte(0);
         } else {
             // Write each label of the domain name along with their lengths
