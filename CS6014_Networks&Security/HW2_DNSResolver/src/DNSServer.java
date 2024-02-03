@@ -20,7 +20,7 @@ public class DNSServer {
 
         DNSMessage response = DNSMessage.decodeMessage(responsePkt.getData());
 
-        for(DNSRecord answer : response.getAnswer_()){
+        for(DNSRecord answer : response.getAnswers_()){
             DNSCache.insertRecord(question, answer);
         }
         return response;
@@ -29,7 +29,6 @@ public class DNSServer {
     public static void main(String[] args) throws IOException {
 
         DatagramSocket socket = new DatagramSocket(DNS_SERVER_PORT);
-//        DatagramSocket googleSocket = new DatagramSocket();
 
         while (true) {
             byte[] buffer = new byte[1024];
@@ -39,15 +38,16 @@ public class DNSServer {
             DNSMessage request = DNSMessage.decodeMessage(pkt.getData());
             DNSMessage response = new DNSMessage();
 
-            for (DNSQuestion question : request.getQuestion_()) {
+            for (DNSQuestion question : request.getQuestions_()) {
                 DNSRecord record = DNSCache.queryRecord(question);
                 if (DNS_CACHE.isCached(question)) {
                     ArrayList<DNSRecord> arr = new ArrayList<>();
                     arr.add(record);
                     response = DNSMessage.buildResponse(request, arr);
-                    
+
                 } else {
-                    response = sendDnsRequestToGoogle(socket, buffer, question);
+                    byte[] b = request.toBytes();
+                    response = sendDnsRequestToGoogle(socket, b, question);
                 }
             }
             byte[] responseData = response.toBytes();

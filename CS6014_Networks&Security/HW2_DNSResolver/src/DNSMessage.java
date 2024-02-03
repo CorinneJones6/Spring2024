@@ -20,160 +20,211 @@ import java.util.List;
  */
 public class DNSMessage {
     private DNSHeader header_;
-    private ArrayList<DNSQuestion> question_;
-    private ArrayList<DNSRecord> answer_;
-    private ArrayList<DNSRecord> authority_;
-    private ArrayList<DNSRecord> additional_;
-
+    private ArrayList<DNSQuestion> questions_;
+    private ArrayList<DNSRecord> answers_;
+    private ArrayList<DNSRecord> authorities_;
+    private ArrayList<DNSRecord> additionals_;
     static byte[] messageBytes;
-
     HashMap<String, Integer> domainLocations_;
 
-    DNSMessage(){
+    DNSMessage() {
 
     }
+
+    /**
+     * Decodes a DNS message from the given byte array and constructs a DNSMessage object.
+     *
+     * @param bytes The byte array containing the DNS message data.
+     * @return A DNSMessage object representing the decoded DNS message.
+     * @throws IOException If there is an error during the decoding process.
+     */
     static DNSMessage decodeMessage(byte[] bytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
+        messageBytes = bytes;
+        //initialize member variables to avoid nullptr exceptions
         DNSMessage dnsMessage = new DNSMessage();
-        dnsMessage.header_= new DNSHeader();
-        dnsMessage.question_ = new ArrayList<>();
-        dnsMessage.answer_ = new ArrayList<>();
-        dnsMessage.authority_ = new ArrayList<>();
-        dnsMessage.additional_ = new ArrayList<>();
+        dnsMessage.header_ = new DNSHeader();
+        dnsMessage.questions_ = new ArrayList<>();
+        dnsMessage.answers_ = new ArrayList<>();
+        dnsMessage.authorities_ = new ArrayList<>();
+        dnsMessage.additionals_ = new ArrayList<>();
 
         dnsMessage.header_ = DNSHeader.decodeHeader(byteArrayInputStream);
 
         for (int i = 0; i < dnsMessage.header_.getQdCount_(); i++) {
             DNSQuestion question = (DNSQuestion.decodeQuestion(dataInputStream, dnsMessage));
-            dnsMessage.question_.add(question);
+            dnsMessage.questions_.add(question);
         }
 
         for (int i = 0; i < dnsMessage.header_.getAnCount_(); i++) {
-            dnsMessage.answer_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
+            dnsMessage.answers_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
         }
 
         for (int i = 0; i < dnsMessage.header_.getNsCount_(); i++) {
-            dnsMessage.authority_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
+            dnsMessage.authorities_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
         }
 
         for (int i = 0; i < dnsMessage.header_.getArCount_(); i++) {
-            dnsMessage.additional_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
+            dnsMessage.additionals_.add(DNSRecord.decodeRecord(dataInputStream, dnsMessage));
         }
 
         return dnsMessage;
     }
-    public static String[] readDomainName(InputStream is) throws IOException {
-        List<String> labels = new ArrayList<>();
-        DataInputStream stream = new DataInputStream(is);
-        byte length = stream.readByte();
-        if(length==0){
+
+    /**
+     * Reads and decodes a domain name from the given InputStream.
+     *
+     * @param inputStream The InputStream containing the domain name data.
+     * @return An array of labels representing the decoded domain name.
+     * @throws IOException If there is an error during the reading or decoding process.
+     */
+    public static String[] readDomainName(InputStream inputStream) throws IOException {
+        List<String> domainLabels = new ArrayList<>();
+        DataInputStream dataInputStream = new DataInputStream(inputStream);
+        byte labelLength = dataInputStream.readByte();
+        if (labelLength == 0) {
             return new String[0];
         }
-        while(length!=0){
+        while (labelLength != 0) {
             byte[] buffer;
-            buffer = stream.readNBytes(length);
+            buffer = dataInputStream.readNBytes(labelLength);
             String str = new String(buffer, StandardCharsets.UTF_8);
-            labels.add(str);
-            length = stream.readByte();
+            domainLabels.add(str);
+            labelLength = dataInputStream.readByte();
         }
-        return labels.toArray(new String[0]);
+        return domainLabels.toArray(new String[0]);
     }
 
+    /**
+     * Reads and decodes a domain name from a byte array starting at the specified index.
+     *
+     * @param firstByte The index within the byte array from which to start reading the domain name.
+     * @return An array of labels representing the decoded domain name.
+     * @throws IOException If there is an error during the reading or decoding process.
+     */
     public static String[] readDomainName(int firstByte) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(messageBytes, firstByte, messageBytes.length-firstByte);
-        return readDomainName(inputStream);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(messageBytes, firstByte, messageBytes.length - firstByte);
+        return readDomainName(byteArrayInputStream);
     }
 
-    static DNSMessage buildResponse(DNSMessage request, ArrayList<DNSRecord> answer){
-      DNSMessage response = new DNSMessage();
-      response.header_ = DNSHeader.buildHeaderForResponse(request);
-      response.question_ = request.question_;
-      response.answer_ = answer;
-      response.authority_ = new ArrayList<>();
-      response.additional_ = new ArrayList<>();
-      return response;
+    /**
+     * Builds a DNS response message based on the provided DNS request message and answer records.
+     *
+     * @param request       The DNSMessage object representing the original DNS request.
+     * @param answerRecords An ArrayList of DNSRecord objects representing the answer records for the response.
+     * @return A DNSMessage object representing the DNS response message.
+     */
+    static DNSMessage buildResponse(DNSMessage request, ArrayList<DNSRecord> answerRecords) {
+        DNSMessage response = new DNSMessage();
+        response.header_ = DNSHeader.buildHeaderForResponse(request);
+        response.questions_ = request.questions_;
+        response.answers_ = answerRecords;
+        response.authorities_ = new ArrayList<>();
+        response.additionals_ = new ArrayList<>();
+        return response;
     }
 
+    /**
+     * Converts the DNSMessage object into a byte array representation suitable for network transmission.
+     *
+     * @return A byte array containing the serialized DNSMessage data.
+     * @throws IOException If there is an error during the serialization process.
+     */
     public byte[] toBytes() throws IOException {
-        //Convert the DNS message into a byte array for transmission
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         header_.writeBytes(byteArrayOutputStream);
-        //Hashmap for domainLocations
         domainLocations_ = new HashMap<>();
 
-        for (DNSQuestion question: question_){
+        for (DNSQuestion question : questions_) {
             question.writeBytes(byteArrayOutputStream, domainLocations_);
         }
-        for(DNSRecord answer: answer_){
+        for (DNSRecord answer : answers_) {
             answer.writeBytes(byteArrayOutputStream, domainLocations_);
         }
-        for(DNSRecord authority: authority_){
+        for (DNSRecord authority : authorities_) {
             authority.writeBytes(byteArrayOutputStream, domainLocations_);
         }
-        for(DNSRecord additional: additional_){
+        for (DNSRecord additional : additionals_) {
             additional.writeBytes(byteArrayOutputStream, domainLocations_);
         }
         return byteArrayOutputStream.toByteArray();
     }
 
-    static void writeDomainName(ByteArrayOutputStream bo, HashMap<String, Integer> domainLocations, String[] domainPieces) throws IOException {
-        DataOutputStream outputStream = new DataOutputStream(bo);
+    /**
+     * Writes a domain name to the provided ByteArrayOutputStream using compression if possible.
+     *
+     * @param byteArrayOutputStream The ByteArrayOutputStream where the domain name will be written.
+     * @param domainLocations       A HashMap mapping domain names to their locations for compression.
+     * @param domainPieces          An array of labels representing the domain name to be written.
+     * @throws IOException If there is an error during the writing process.
+     */
+    static void writeDomainName(ByteArrayOutputStream byteArrayOutputStream, HashMap<String, Integer> domainLocations, String[] domainPieces) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(byteArrayOutputStream);
         String domainName = joinDomainName(domainPieces);
-
-        if (domainLocations.containsKey(domainName)) {
-            int location = domainLocations.get(domainName);
-            outputStream.writeShort(0xC000 | location);
-
-        } else {
-            int location = outputStream.size();
-            domainLocations.put(domainName, location);
-
-            for(String label: domainPieces){
+        if( domainName.length() == 0){
+            outputStream.writeByte(0);
+        }
+        else {
+            // Write each label of the domain name along with their lengths
+            for (String label : domainPieces) {
                 byte[] labelBytes = label.getBytes(StandardCharsets.UTF_8);
                 outputStream.writeByte(labelBytes.length);
                 outputStream.write(labelBytes);
             }
-            outputStream.writeByte(0);
         }
-   }
+        // Terminate the domain name with a null byte
+        outputStream.writeByte(0);
+    }
 
-    public static String joinDomainName(String[] pieces){
+    /**
+     * Joins an array of domain name pieces into a single dot-separated domain name string.
+     *
+     * @param pieces An array of labels representing the domain name pieces to be joined.
+     * @return A single domain name string with labels separated by dots.
+     */
+    public static String joinDomainName(String[] pieces) {
         return String.join(".", pieces);
     }
 
+    /**
+     * Returns a string representation of the DNSMessage object.
+     *
+     * @return A string containing the values of the DNSMessage's fields.
+     */
     @Override
     public String toString() {
         return "DNSMessage{" +
                 "header_=" + header_ +
-                ", question_=" + question_ +
-                ", answer_=" + answer_ +
-                ", authority_=" + authority_ +
-                ", additional_=" + additional_ +
+                ", question_=" + questions_ +
+                ", answer_=" + answers_ +
+                ", authority_=" + authorities_ +
+                ", additional_=" + additionals_ +
                 ", messageBytes=" + Arrays.toString(messageBytes) +
                 '}';
     }
 
-    //========== Getters ==========//
-
+    /**
+     * Getter methods for retrieving DNSMessage member variables.
+     */
     public DNSHeader getHeader_() {
         return header_;
     }
 
-    public ArrayList<DNSQuestion> getQuestion_() {
-        return question_;
+    public ArrayList<DNSQuestion> getQuestions_() {
+        return questions_;
     }
 
-    public ArrayList<DNSRecord> getAnswer_() {
-        return answer_;
+    public ArrayList<DNSRecord> getAnswers_() {
+        return answers_;
     }
 
-    public ArrayList<DNSRecord> getAuthority_() {
-        return authority_;
+    public ArrayList<DNSRecord> getAuthorities_() {
+        return authorities_;
     }
 
-    public ArrayList<DNSRecord> getAdditional_() {
-        return additional_;
+    public ArrayList<DNSRecord> getAdditionals_() {
+        return additionals_;
     }
 }
