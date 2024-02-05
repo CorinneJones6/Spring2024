@@ -62,7 +62,7 @@ public class DNSRecord {
         // Read the first two bytes to determine if it's a compressed or full domain name
         short firstTwoBytes = dataInputStream.readByte();
 
-        if ((firstTwoBytes & 0xC0) == 0xC0) {
+        if ((firstTwoBytes & 0b11000000) == 0b11000000) {
             // Handle compressed domain name with offset
             int offset = dataInputStream.readByte();
             // int offset = firstTwoBytes & 0x3FFF;
