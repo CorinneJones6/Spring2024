@@ -15,17 +15,34 @@ public class DNSCache {
      * @param message  The DNSRecord to be associated with the question in the cache.
      */
     public static synchronized void insertRecord(DNSQuestion question, DNSRecord message) {
-        cache.put(question, message);
+        if (!cache.containsKey(question)) {
+            cache.put(question, message);
+        }
     }
 
     /**
      * Queries the cache for a DNS record associated with a given DNS question.
      *
      * @param question The DNSQuestion for which to retrieve the associated DNSRecord.
-     * @return The DNSRecord associated with the question, or null if not found in the cache.
+     * @return The DNSRecord associated with the question, or null if not found in the cache
+     * or if the cached record has expired.
      */
     public static synchronized DNSRecord queryRecord(DNSQuestion question) {
-        return cache.getOrDefault(question, null); //Return record if exists, null otherwise
+        if (!cache.containsKey(question)) {
+            // Return null for records not found in the cache
+            return null;
+        }
+
+        DNSRecord record = cache.get(question);
+
+        if (record.isExpired()) {
+            cache.remove(question);
+            // Return null for expired records
+            return null;
+        }
+
+        // Return the non-expired record
+        return record;
     }
 
     /**
@@ -34,7 +51,8 @@ public class DNSCache {
      * @param question The DNSQuestion to check for in the cache.
      * @return true if the DNS question is cached, false otherwise.
      */
-    public synchronized boolean isCached(DNSQuestion question) {
+    public static synchronized boolean isCached(DNSQuestion question) {
         return cache.containsKey(question);
     }
+
 }
