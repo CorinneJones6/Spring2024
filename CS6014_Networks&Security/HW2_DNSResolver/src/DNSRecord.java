@@ -65,7 +65,7 @@ public class DNSRecord {
         if ((firstTwoBytes & 0b11000000) == 0b11000000) {
             // Handle compressed domain name with offset
             int offset = dataInputStream.readByte();
-            // int offset = firstTwoBytes & 0x3FFF;
+
             name = dnsMessage.readDomainName(offset);
 
         } else {

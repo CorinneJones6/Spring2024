@@ -2,11 +2,12 @@ import java.util.HashMap;
 
 public class DNSCache {
 
-    private static HashMap<DNSQuestion, DNSRecord> cache;
+    private static HashMap<DNSQuestion, DNSRecord> cache = new HashMap<>();
 
     DNSCache() {
         cache = new HashMap<>();
     }
+
 
     /**
      * Inserts a DNS question-answer pair into the cache.
@@ -14,7 +15,7 @@ public class DNSCache {
      * @param question The DNSQuestion to use as the key for caching.
      * @param message  The DNSRecord to be associated with the question in the cache.
      */
-    public static synchronized void insertRecord(DNSQuestion question, DNSRecord message) {
+    public static void insertRecord(DNSQuestion question, DNSRecord message) {
         if (!cache.containsKey(question)) {
             cache.put(question, message);
         }
@@ -27,7 +28,7 @@ public class DNSCache {
      * @return The DNSRecord associated with the question, or null if not found in the cache
      * or if the cached record has expired.
      */
-    public static synchronized DNSRecord queryRecord(DNSQuestion question) {
+    public static DNSRecord queryRecord(DNSQuestion question) {
         if (!cache.containsKey(question)) {
             // Return null for records not found in the cache
             return null;

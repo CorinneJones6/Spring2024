@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class DNSServer {
     private static final int DNS_SERVER_PORT = 8053;
-    private static DNSCache cache = new DNSCache();
     private static final int MAX_PACKET_SIZE = 1024;
     private static final int GOOGLE_DNS_PORT = 53;
     private static final String GOOGLE_DNS_IP = "8.8.8.8";
@@ -34,7 +33,7 @@ public class DNSServer {
             for (DNSQuestion question : request.getQuestions_()) {
                 // Query the DNSCache for a cached DNSRecord
                 DNSRecord record = DNSCache.queryRecord(question);
-                if (cache.isCached(question)) {
+                if (record!=null) {
                     // If a cached record exists, build a response with the cached record
                     ArrayList<DNSRecord> answerRecords = new ArrayList<>();
                     answerRecords.add(record);

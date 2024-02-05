@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -90,10 +91,17 @@ public class DNSQuestion {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DNSQuestion that = (DNSQuestion) o;
-        return qType_ == that.qType_ && qClass_ == that.qClass_ && Objects.equals(qName_, that.qName_);
+        if (!(o instanceof DNSQuestion question)) return false;
+        boolean c1 = qType_ == question.qType_;
+        boolean c2 = qClass_ == question.qClass_;
+        boolean c3 = Arrays.equals(qName_, question.qName_);
+        System.out.println(c1);
+        System.out.println(c2);
+        System.out.println(c3);
+
+        return qType_ == question.qType_ && qClass_ == question.qClass_ && Arrays.equals(qName_, question.qName_);
     }
+
 
     /**
      * Computes a hash code for the DNSQuestion object.
@@ -102,7 +110,8 @@ public class DNSQuestion {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(qName_, qType_, qClass_);
+        int result = Objects.hash(qType_, qClass_);
+        result = 31 * result + Arrays.hashCode(qName_);
+        return result;
     }
-
 }
