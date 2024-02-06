@@ -31,3 +31,6 @@ run: msdscript
 # 'make run test' will run the executable w/ the test tag
 run test: msdscript
 	./msdscript --test
+
+doc: msdscript
+	cd documentation && doxygen

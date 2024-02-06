@@ -1,0 +1,166 @@
+\doxysection{Num Class Reference}
+\hypertarget{class_num}{}\label{class_num}\index{Num@{Num}}
+Inheritance diagram for Num\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_num}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_num_a9fce58e650a99ae50f4140ed9c87ec9f}{Num}} (int val)
+\begin{DoxyCompactList}\small\item\em Initializes a numeric constant expression. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{class_num_a3bf692f7d3fc54e016affbe618ec11e4}{equals}} (\mbox{\hyperlink{class_expr}{Expr}} \texorpdfstring{$\ast$}{*}e)
+\begin{DoxyCompactList}\small\item\em Checks if this numeric constant is equal to another expression. \end{DoxyCompactList}\item 
+virtual int \mbox{\hyperlink{class_num_a24f8a1c7ccad82bf7ed1080b59cda6dd}{interp}} ()
+\begin{DoxyCompactList}\small\item\em Evaluates to its numeric value. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{class_num_ad0ce114704933a1ebe4629848d3e2d6d}{has\+\_\+variable}} ()
+\begin{DoxyCompactList}\small\item\em Checks if the numeric constant contains a variable. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_expr}{Expr}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_num_aae9ab1271286dfe0d961005dc5084170}{subst}} (string str, \mbox{\hyperlink{class_expr}{Expr}} \texorpdfstring{$\ast$}{*}e)
+\begin{DoxyCompactList}\small\item\em Substitutes a variable within this numeric expression. Since {\ttfamily \doxylink{class_num}{Num}} does not contain variables, it returns itself. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_num_a89cf72d3ac38dd05effc85e9a2604550}{print}} (ostream \&ostream)
+\begin{DoxyCompactList}\small\item\em Prints the numeric value to the specified output stream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_expr}{Expr}}}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_expr_a6e04902c3758d302cbf49bf92181f985}{to\+\_\+string}} ()
+\begin{DoxyCompactList}\small\item\em Converts expression to string representation. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_expr_af5e26a0344722c96d9828dab39377738}{pretty\+\_\+print\+\_\+at}} (ostream \&ostream, precedence\+\_\+t prec)
+\begin{DoxyCompactList}\small\item\em Pretty prints the expression at a given precedence. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_expr_a6e4dbd661cba05e21fefd64e66ea770d}{pretty\+\_\+print}} (ostream \&ostream)
+\begin{DoxyCompactList}\small\item\em Pretty prints the expression. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{class_expr_a37ad43461b3b62e6332bc919f89864aa}{to\+\_\+pretty\+\_\+string}} ()
+\begin{DoxyCompactList}\small\item\em Converts the expression to a pretty string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_num_ab0654582066deb3adbbd64cf7190a7b7}\label{class_num_ab0654582066deb3adbbd64cf7190a7b7} 
+int {\bfseries val}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_num_a9fce58e650a99ae50f4140ed9c87ec9f}\label{class_num_a9fce58e650a99ae50f4140ed9c87ec9f} 
+\index{Num@{Num}!Num@{Num}}
+\index{Num@{Num}!Num@{Num}}
+\doxysubsubsection{\texorpdfstring{Num()}{Num()}}
+{\footnotesize\ttfamily Num\+::\+Num (\begin{DoxyParamCaption}\item[{int}]{val }\end{DoxyParamCaption})}
+
+
+
+Initializes a numeric constant expression. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & The numeric value of the expression. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_num_a3bf692f7d3fc54e016affbe618ec11e4}\label{class_num_a3bf692f7d3fc54e016affbe618ec11e4} 
+\index{Num@{Num}!equals@{equals}}
+\index{equals@{equals}!Num@{Num}}
+\doxysubsubsection{\texorpdfstring{equals()}{equals()}}
+{\footnotesize\ttfamily bool Num\+::equals (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_expr}{Expr}} \texorpdfstring{$\ast$}{*}}]{e }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Checks if this numeric constant is equal to another expression. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em e} & A pointer to the expression to compare with this numeric constant. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the expressions are equal (i.\+e., if {\ttfamily e} is also a {\ttfamily \doxylink{class_num}{Num}} with the same value), false otherwise. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_expr}{Expr}}.
+
+\Hypertarget{class_num_ad0ce114704933a1ebe4629848d3e2d6d}\label{class_num_ad0ce114704933a1ebe4629848d3e2d6d} 
+\index{Num@{Num}!has\_variable@{has\_variable}}
+\index{has\_variable@{has\_variable}!Num@{Num}}
+\doxysubsubsection{\texorpdfstring{has\_variable()}{has\_variable()}}
+{\footnotesize\ttfamily bool Num\+::has\+\_\+variable (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Checks if the numeric constant contains a variable. 
+
+\begin{DoxyReturn}{Returns}
+False, as numeric constants do not contain variables. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_expr}{Expr}}.
+
+\Hypertarget{class_num_a24f8a1c7ccad82bf7ed1080b59cda6dd}\label{class_num_a24f8a1c7ccad82bf7ed1080b59cda6dd} 
+\index{Num@{Num}!interp@{interp}}
+\index{interp@{interp}!Num@{Num}}
+\doxysubsubsection{\texorpdfstring{interp()}{interp()}}
+{\footnotesize\ttfamily int Num\+::interp (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Evaluates to its numeric value. 
+
+\begin{DoxyReturn}{Returns}
+The value of the numeric constant. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_expr}{Expr}}.
+
+\Hypertarget{class_num_a89cf72d3ac38dd05effc85e9a2604550}\label{class_num_a89cf72d3ac38dd05effc85e9a2604550} 
+\index{Num@{Num}!print@{print}}
+\index{print@{print}!Num@{Num}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily void Num\+::print (\begin{DoxyParamCaption}\item[{ostream \&}]{ostream }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Prints the numeric value to the specified output stream. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ostream} & The output stream where the numeric value will be printed. \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{class_expr}{Expr}}.
+
+\Hypertarget{class_num_aae9ab1271286dfe0d961005dc5084170}\label{class_num_aae9ab1271286dfe0d961005dc5084170} 
+\index{Num@{Num}!subst@{subst}}
+\index{subst@{subst}!Num@{Num}}
+\doxysubsubsection{\texorpdfstring{subst()}{subst()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_expr}{Expr}} \texorpdfstring{$\ast$}{*} Num\+::subst (\begin{DoxyParamCaption}\item[{string}]{str,  }\item[{\mbox{\hyperlink{class_expr}{Expr}} \texorpdfstring{$\ast$}{*}}]{e }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Substitutes a variable within this numeric expression. Since {\ttfamily \doxylink{class_num}{Num}} does not contain variables, it returns itself. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & The variable name to look for substitution. \\
+\hline
+{\em e} & The expression to substitute in place of the variable. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to this numeric constant, as no substitution occurs. 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{class_expr}{Expr}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/corinnejones/\+Git\+Hub\+School/\+Spring2024/\+CS6015\+\_\+\+Software\+Engineering/\+MSDScript/\+MSDScript/\mbox{\hyperlink{_expr_8hpp}{Expr.\+hpp}}\item 
+/\+Users/corinnejones/\+Git\+Hub\+School/\+Spring2024/\+CS6015\+\_\+\+Software\+Engineering/\+MSDScript/\+MSDScript/\mbox{\hyperlink{_expr_8cpp}{Expr.\+cpp}}\end{DoxyCompactItemize}

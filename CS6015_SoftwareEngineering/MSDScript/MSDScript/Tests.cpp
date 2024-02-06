@@ -1,9 +1,14 @@
-//
-//  Tests.cpp
-//  ExpressionClasses
-//
-//  Created by Corinne Jones on 1/18/24.
-//
+/**
+ * \file Tests.cpp
+ * \brief Tests for the Expression Classes.
+ *
+ * Provides unit tests for evaluating the functionality of arithmetic expressions,
+ * including basic operations like addition, multiplication, and variable handling
+ * within an expression context. Utilizes the Catch testing framework.
+ *
+ * \author Corinne Jones
+ * \date 1/18/24
+ */
 
 #include <stdio.h>
 #include "Expr.hpp"
@@ -134,11 +139,37 @@ TEST_CASE("TESTING VAR"){
     Var* var = new Var("x");
     CHECK( (var)->subst("y", new Num(42)) == var );
 }
-          
-TEST_CASE("Testing Print/Pretty Print"){
+     
+TEST_CASE("Testing to_string()"){
+    Num n1(5);
+    REQUIRE(n1.to_string() == "5");
+
+    Num n2(-3);
+    REQUIRE(n2.to_string() == "-3");
+    
+    Add a1(new Num(5), new Num(3));
+    REQUIRE(a1.to_string() == "(5+3)");
+
+    Add a2(new Num(-2), new Num(4));
+    REQUIRE(a2.to_string() == "(-2+4)");
+    
+    Mult m1(new Num(6), new Num(7));
+    REQUIRE(m1.to_string() == "(6*7)");
+
+    Mult m2(new Num(-1), new Num(3));
+    REQUIRE(m2.to_string() == "(-1*3)");
+    
+    Var v1("x");
+    REQUIRE(v1.to_string() == "x");
+
+    Var v2("y");
+    REQUIRE(v2.to_string() == "y");
+}
+
+TEST_CASE("Testing Pretty Print"){
     CHECK ( (new Mult(new Num(1), new Add(new Num(2), new Num(3))))->to_pretty_string() ==  "1 * (2 + 3)" );
     CHECK ( (new Mult(new Mult(new Num(8), new Num(1)), new Var("y")))->to_pretty_string() ==  "(8 * 1) * y" );
-//    CHECK ( (new Mult(new Add(new Num(3), new Num(5)), new Mult(new Num(6), new Num(1))))->to_pretty_string() ==  "(3 + 5) * 6 * 1" );
+    CHECK ( (new Mult(new Add(new Num(3), new Num(5)), new Mult(new Num(6), new Num(1))))->to_pretty_string() ==  "(3 + 5) * 6 * 1" );
     CHECK ( (new Mult(new Mult(new Num(7), new Num(7)), new Add(new Num(9), new Num(2))) )->to_pretty_string() ==  "(7 * 7) * (9 + 2)" );
 }
 

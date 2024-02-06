@@ -1,3 +1,8 @@
+/**
+ *\mainpage MSDScript
+ *\author Corinne Jones
+ *\date 01-16-2024
+ */
 
 #include <iostream>
 #include "cmdline.hpp"

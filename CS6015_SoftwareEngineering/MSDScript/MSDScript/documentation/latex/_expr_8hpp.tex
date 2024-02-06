@@ -1,0 +1,47 @@
+\doxysection{/\+Users/corinnejones/\+Git\+Hub\+School/\+Spring2024/\+CS6015\+\_\+\+Software\+Engineering/\+MSDScript/\+MSDScript/\+Expr.hpp File Reference}
+\hypertarget{_expr_8hpp}{}\label{_expr_8hpp}\index{/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/Expr.hpp@{/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/Expr.hpp}}
+
+
+Declaration of expression classes for arithmetic operations.  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_expr}{Expr}}
+\item 
+class \mbox{\hyperlink{class_add}{Add}}
+\item 
+class \mbox{\hyperlink{class_mult}{Mult}}
+\item 
+class \mbox{\hyperlink{class_num}{Num}}
+\item 
+class \mbox{\hyperlink{class_var}{Var}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{_expr_8hpp_a9e5fdf365cd8dc7be4d972daf07f8bdf}\label{_expr_8hpp_a9e5fdf365cd8dc7be4d972daf07f8bdf} 
+enum {\bfseries precedence\+\_\+t} \{ {\bfseries prec\+\_\+none}
+, {\bfseries prec\+\_\+add}
+, {\bfseries prec\+\_\+mult}
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of expression classes for arithmetic operations. 
+
+Defines the abstract base class \doxylink{class_expr}{Expr} and its derived classes such as \doxylink{class_add}{Add}, \doxylink{class_mult}{Mult}, \doxylink{class_num}{Num}, and \doxylink{class_var}{Var}. These classes are used to construct and evaluate arithmetic expressions involving basic operations and variables. Includes functionality for equality checking, evaluation, variable substitution, and pretty printing of expressions.
+
+\begin{DoxyAuthor}{Author}
+Corinne Jones 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+1/16/24 
+\end{DoxyDate}
