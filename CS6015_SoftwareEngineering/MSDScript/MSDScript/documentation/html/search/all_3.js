@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['has_5fvariable_0',['has_variable',['../class_add.html#a882db0df18673599f4d1248e17fb24cb',1,'Add::has_variable()'],['../class_mult.html#ab53cc8634d4ebad5aaa2dc818c0de598',1,'Mult::has_variable()'],['../class_num.html#ad0ce114704933a1ebe4629848d3e2d6d',1,'Num::has_variable()'],['../class_var.html#a6083356e4955e1edfb76b8432672c93e',1,'Var::has_variable()']]]
+  ['equals_0',['equals',['../class_add.html#abf7aaca3dc46de4409fe80bd829e1da1',1,'Add::equals()'],['../class_mult.html#a01e8b8d819db386b353d7191424cc97e',1,'Mult::equals()'],['../class_num.html#a3bf692f7d3fc54e016affbe618ec11e4',1,'Num::equals()'],['../class_var.html#a36314fbf7736f619da64b854f4437949',1,'Var::equals()']]],
+  ['expr_1',['Expr',['../class_expr.html',1,'']]],
+  ['expr_2ecpp_2',['Expr.cpp',['../_expr_8cpp.html',1,'']]],
+  ['expr_2ehpp_3',['Expr.hpp',['../_expr_8hpp.html',1,'']]]
 ];

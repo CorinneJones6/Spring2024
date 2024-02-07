@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['interp_0',['interp',['../class_add.html#a63c445ae0ea8ecc0d0765378e630a06f',1,'Add::interp()'],['../class_mult.html#a7d3fba024174b294a7e1c145485b9d38',1,'Mult::interp()'],['../class_num.html#a24f8a1c7ccad82bf7ed1080b59cda6dd',1,'Num::interp()'],['../class_var.html#ac6df55db7c2447d3090dd99ae247ae80',1,'Var::interp()']]]
+  ['has_5fvariable_0',['has_variable',['../class_add.html#a882db0df18673599f4d1248e17fb24cb',1,'Add::has_variable()'],['../class_mult.html#ab53cc8634d4ebad5aaa2dc818c0de598',1,'Mult::has_variable()'],['../class_num.html#ad0ce114704933a1ebe4629848d3e2d6d',1,'Num::has_variable()'],['../class_var.html#a6083356e4955e1edfb76b8432672c93e',1,'Var::has_variable()']]]
 ];

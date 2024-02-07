@@ -1,4 +1,4 @@
-LATEX_CMD?=pdflatex
+LATEX_CMD?=/usr/local/texlive/2023/bin/universal-darwin/pdflatex
 MKIDX_CMD?=makeindex
 BIBTEX_CMD?=bibtex
 LATEX_COUNT?=8

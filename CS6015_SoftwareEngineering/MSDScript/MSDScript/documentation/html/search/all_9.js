@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['tests_2ecpp_0',['Tests.cpp',['../_tests_8cpp.html',1,'']]],
-  ['to_5fpretty_5fstring_1',['to_pretty_string',['../class_expr.html#a37ad43461b3b62e6332bc919f89864aa',1,'Expr']]],
-  ['to_5fstring_2',['to_string',['../class_expr.html#a6e04902c3758d302cbf49bf92181f985',1,'Expr']]]
+  ['subst_0',['subst',['../class_add.html#ac8a97a09ab57df586b1ae872b248454e',1,'Add::subst()'],['../class_mult.html#ab2181b3e86b94abaa42551429f5174ee',1,'Mult::subst()'],['../class_num.html#aae9ab1271286dfe0d961005dc5084170',1,'Num::subst()'],['../class_var.html#a6e4f0a95891d3eec96bb337ba8a2a2b6',1,'Var::subst()']]]
 ];

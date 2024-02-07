@@ -119,7 +119,32 @@
 \DoxyCodeLine{00127\ \ \ \ \ }
 \DoxyCodeLine{00128\ \};}
 \DoxyCodeLine{00129\ }
-\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00130\ \textcolor{comment}{//======================\ \ LET\ \ ======================//}}
 \DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class__let}{\_let}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_expr}{Expr}}\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ }
+\DoxyCodeLine{00134\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{class_var}{Var}}*\ lhs;}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{class_expr}{Expr}}*\ rhs;}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{class_expr}{Expr}}*\ body;}
+\DoxyCodeLine{00138\ \ \ \ \ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{class__let}{\_let}}(\mbox{\hyperlink{class_var}{Var}}*\ lhs,\ \mbox{\hyperlink{class_expr}{Expr}}*\ rhs,\ \mbox{\hyperlink{class_expr}{Expr}}*\ body);}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ equals(\mbox{\hyperlink{class_expr}{Expr}}*\ e);}
+\DoxyCodeLine{00142\ \ \ \ \ }
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ interp();}
+\DoxyCodeLine{00144\ \ \ \ \ }
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ has\_variable();}
+\DoxyCodeLine{00146\ \ \ \ \ }
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_expr}{Expr}}*\ subst(\textcolor{keywordtype}{string}\ str,\ \mbox{\hyperlink{class_expr}{Expr}}*\ e);}
+\DoxyCodeLine{00148\ \ \ \ \ }
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ print(ostream\ \&ostream);}
+\DoxyCodeLine{00150\ \ \ \ \ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class__let_aca042cea4daa35ba53246501d74bc211}{pretty\_print\_at}}(ostream\ \&ostream,\ precedence\_t\ prec);}
+\DoxyCodeLine{00152\ \ \ \ \ }
+\DoxyCodeLine{00153\ \};}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ }
 
 \end{DoxyCode}

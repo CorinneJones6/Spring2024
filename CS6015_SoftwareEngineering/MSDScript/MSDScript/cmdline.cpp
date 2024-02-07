@@ -1,3 +1,18 @@
+/**
+ * \file main.cpp
+ * \brief Command line argument handler for test execution.
+ *
+ * This file contains the entry point for the application, handling command line arguments
+ * to provide help information or to execute tests using the Catch testing framework. It supports
+ * '--help' for displaying usage information and '--test' for running tests.
+ *
+ * Usage:
+ *  ./application --help  Displays help information.
+ *  ./application --test  Executes all compiled tests.
+ *
+ * \author Corinne Jones
+ * \date 1/16/24
+ */
 #define CATCH_CONFIG_RUNNER
 #include "catch.h"
 #include "cmdline.hpp"

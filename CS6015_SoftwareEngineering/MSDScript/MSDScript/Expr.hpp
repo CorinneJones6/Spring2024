@@ -127,5 +127,30 @@ public:
     
 };
 
+//======================  LET  ======================//
+
+class Let : public Expr {
+    
+public:
+    Var* lhs;
+    Expr* rhs;
+    Expr* body;
+    
+    Let(Var* lhs, Expr* rhs, Expr* body);
+
+    virtual bool equals(Expr* e);
+    
+    virtual int interp();
+    
+    virtual bool has_variable();
+    
+    virtual Expr* subst(string str, Expr* e);
+    
+    virtual void print(ostream &ostream);
+    
+    void pretty_print_at(ostream &ostream, precedence_t prec);
+    
+};
+
 
 

@@ -1,0 +1,138 @@
+\begin{theindex}
+
+  \item {/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/Expr.cpp}, 
+		\hyperpage{28}
+  \item {/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/Expr.hpp}, 
+		\hyperpage{28}
+  \item {/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/Tests.cpp}, 
+		\hyperpage{32}
+  \item {/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/cmdline.hpp}, 
+		\hyperpage{27}
+  \item {/Users/corinnejones/GitHubSchool/Spring2024/CS6015\_SoftwareEngineering/MSDScript/MSDScript/main.cpp}, 
+		\hyperpage{31}
+  \item {\_let}, \hyperpage{9}
+    \subitem {equals}, \hyperpage{10}
+    \subitem {has\_variable}, \hyperpage{10}
+    \subitem {interp}, \hyperpage{10}
+    \subitem {pretty\_print\_at}, \hyperpage{10}
+    \subitem {print}, \hyperpage{10}
+    \subitem {subst}, \hyperpage{10}
+
+  \indexspace
+
+  \item {Add}, \hyperpage{11}
+    \subitem {Add}, \hyperpage{12}
+    \subitem {equals}, \hyperpage{12}
+    \subitem {has\_variable}, \hyperpage{12}
+    \subitem {interp}, \hyperpage{12}
+    \subitem {pretty\_print\_at}, \hyperpage{13}
+    \subitem {print}, \hyperpage{13}
+    \subitem {subst}, \hyperpage{13}
+
+  \indexspace
+
+  \item {equals}
+    \subitem {\_let}, \hyperpage{10}
+    \subitem {Add}, \hyperpage{12}
+    \subitem {Expr}, \hyperpage{14}
+    \subitem {Mult}, \hyperpage{18}
+    \subitem {Num}, \hyperpage{21}
+    \subitem {Var}, \hyperpage{23}
+  \item {Expr}, \hyperpage{14}
+    \subitem {equals}, \hyperpage{14}
+    \subitem {has\_variable}, \hyperpage{14}
+    \subitem {interp}, \hyperpage{15}
+    \subitem {pretty\_print}, \hyperpage{15}
+    \subitem {pretty\_print\_at}, \hyperpage{15}
+    \subitem {print}, \hyperpage{15}
+    \subitem {subst}, \hyperpage{15}
+    \subitem {to\_pretty\_string}, \hyperpage{16}
+    \subitem {to\_string}, \hyperpage{16}
+
+  \indexspace
+
+  \item {has\_variable}
+    \subitem {\_let}, \hyperpage{10}
+    \subitem {Add}, \hyperpage{12}
+    \subitem {Expr}, \hyperpage{14}
+    \subitem {Mult}, \hyperpage{18}
+    \subitem {Num}, \hyperpage{21}
+    \subitem {Var}, \hyperpage{24}
+
+  \indexspace
+
+  \item {interp}
+    \subitem {\_let}, \hyperpage{10}
+    \subitem {Add}, \hyperpage{12}
+    \subitem {Expr}, \hyperpage{15}
+    \subitem {Mult}, \hyperpage{18}
+    \subitem {Num}, \hyperpage{21}
+    \subitem {Var}, \hyperpage{24}
+
+  \indexspace
+
+  \item {MSDScript}, \hyperpage{1}
+  \item {Mult}, \hyperpage{16}
+    \subitem {equals}, \hyperpage{18}
+    \subitem {has\_variable}, \hyperpage{18}
+    \subitem {interp}, \hyperpage{18}
+    \subitem {Mult}, \hyperpage{17}
+    \subitem {pretty\_print\_at}, \hyperpage{18}
+    \subitem {print}, \hyperpage{19}
+    \subitem {subst}, \hyperpage{19}
+
+  \indexspace
+
+  \item {Num}, \hyperpage{19}
+    \subitem {equals}, \hyperpage{21}
+    \subitem {has\_variable}, \hyperpage{21}
+    \subitem {interp}, \hyperpage{21}
+    \subitem {Num}, \hyperpage{20}
+    \subitem {print}, \hyperpage{21}
+    \subitem {subst}, \hyperpage{22}
+
+  \indexspace
+
+  \item {pretty\_print}
+    \subitem {Expr}, \hyperpage{15}
+  \item {pretty\_print\_at}
+    \subitem {\_let}, \hyperpage{10}
+    \subitem {Add}, \hyperpage{13}
+    \subitem {Expr}, \hyperpage{15}
+    \subitem {Mult}, \hyperpage{18}
+  \item {print}
+    \subitem {\_let}, \hyperpage{10}
+    \subitem {Add}, \hyperpage{13}
+    \subitem {Expr}, \hyperpage{15}
+    \subitem {Mult}, \hyperpage{19}
+    \subitem {Num}, \hyperpage{21}
+    \subitem {Var}, \hyperpage{24}
+
+  \indexspace
+
+  \item {subst}
+    \subitem {\_let}, \hyperpage{10}
+    \subitem {Add}, \hyperpage{13}
+    \subitem {Expr}, \hyperpage{15}
+    \subitem {Mult}, \hyperpage{19}
+    \subitem {Num}, \hyperpage{22}
+    \subitem {Var}, \hyperpage{24}
+
+  \indexspace
+
+  \item {to\_pretty\_string}
+    \subitem {Expr}, \hyperpage{16}
+  \item {to\_string}
+    \subitem {Expr}, \hyperpage{16}
+
+  \indexspace
+
+  \item {Var}, \hyperpage{22}
+    \subitem {equals}, \hyperpage{23}
+    \subitem {has\_variable}, \hyperpage{24}
+    \subitem {interp}, \hyperpage{24}
+    \subitem {print}, \hyperpage{24}
+    \subitem {subst}, \hyperpage{24}
+    \subitem {Var}, \hyperpage{23}
+
+\end{theindex}

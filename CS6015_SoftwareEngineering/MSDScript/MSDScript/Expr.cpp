@@ -334,3 +334,83 @@ Expr* Var::subst(string str, Expr* e){
 void Var::print (ostream &ostream){
     ostream << val;
 }
+
+//======================  LET  ======================//
+/**
+ * \brief Constructor for a Let expression.
+ * \param lhs The variable on the left-hand side to bind the value to.
+ * \param rhs The expression on the right-hand side whose value will be bound to lhs.
+ * \param body The body of the Let expression where lhs may be used.
+ */
+Let::Let(Var* lhs, Expr* rhs, Expr* body){
+    this->lhs = lhs;
+    this->rhs = rhs;
+    this->body = body;
+}
+
+/**
+ * \brief Checks if this Let expression is equal to another expression.
+ * \param e The expression to compare with.
+ * \return True if both expressions are Let expressions with equal lhs, rhs, and body; otherwise false.
+ */
+bool Let::equals(Expr* e){
+ Let* _letPtr = dynamic_cast<Let*>(e);
+    
+ if(_letPtr==nullptr){
+        return false;
+ }
+ return this->lhs->equals(_letPtr->lhs) && this->rhs->equals(_letPtr->rhs) && this->body->equals(_letPtr->body);
+}
+
+/**
+ * \brief Interprets the Let expression by evaluating rhs, substituting it into body, and then evaluating the result.
+ * \return The integer result of interpreting the Let expression.
+ */
+int Let::interp(){
+    
+     int rhsValue = rhs->interp();
+
+     Num* tempNum = new Num(rhsValue);
+
+     Expr* substitutedBody = body->subst(lhs->val, tempNum);
+
+     return substitutedBody->interp();
+}
+
+/**
+ * \brief Determines if the Let expression contains a variable.
+ * \return True if either rhs or body contains a variable; otherwise false.
+ */
+bool Let::has_variable(){
+    return this->rhs->has_variable()||this->body->has_variable();
+}
+
+/**
+ * \brief Performs substitution within the Let expression.
+ * \param str The variable name to substitute.
+ * \param e The expression to replace str with.
+ * \return A new Let expression with the substitution made.
+ */
+Expr* Let::subst(string str, Expr* e){
+    // Check if the variable to substitute is the same as the Let's lhs
+       if (lhs->val == str) {
+           // If yes, do not substitute within the body, as the Let's variable shadows it
+           return new Let(lhs, rhs->subst(str, e), body);
+       } else {
+           // If not, substitute within both rhs and body
+           return new Let(lhs, rhs->subst(str, e), body->subst(str, e));
+       }
+}
+
+
+/**
+ * \brief Prints the Let expression to the provided output stream in a specific format.
+ * \param ostream The output stream to print to.
+ */
+void Let::print(ostream &ostream){
+    ostream << "(_let " << lhs->val << "=" << rhs->to_string() << " _in " << body->to_string() << ")";
+}
+
+void Let::pretty_print_at(ostream &ostream, precedence_t prec){
+    
+}
