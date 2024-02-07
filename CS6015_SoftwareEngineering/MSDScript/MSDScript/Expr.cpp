@@ -336,6 +336,7 @@ void Var::print (ostream &ostream){
 }
 
 //======================  LET  ======================//
+
 /**
  * \brief Constructor for a Let expression.
  * \param lhs The variable on the left-hand side to bind the value to.
@@ -402,7 +403,6 @@ Expr* Let::subst(string str, Expr* e){
        }
 }
 
-
 /**
  * \brief Prints the Let expression to the provided output stream in a specific format.
  * \param ostream The output stream to print to.
@@ -411,6 +411,11 @@ void Let::print(ostream &ostream){
     ostream << "(_let " << lhs->val << "=" << rhs->to_string() << " _in " << body->to_string() << ")";
 }
 
+/**
+ * \brief Pretty prints the expression with precedence handling.
+ * \param ostream The output stream.
+ * \param prec The current precedence level.
+ */
 void Let::pretty_print_at(ostream &ostream, precedence_t prec){
     
 }

@@ -1,0 +1,21 @@
+Corinne Jones
+
+Question 1: Reliable Data Transfer
+
+
+Question 2: Throttling
+
+Flow Control - When a sending host (e.g., server) sends something to a receiving host (e.g., netbook), the sending host needs to make sure the receiver can process it fast enough and not become overwhelmed (i.e., flow control). So, flow control is all about one host not overwhelming another host. In TCP, a sender implements "flow control," and slowing its rate as needed. Receivers send the size of the receiving window, (i.e., the amount of free space in the buffer). The sender sends less data than the last receiving window. If the receiving window is ever 0 then the sender sends 1 byte at a time. 
+
+Congestion Control - Congestion control is not about one host overwhelming another, but is about what is happening on a network and if the network is overwhelmed (i.e., "congested"). When a network is overwhelmed, packets get delayed or dropped. TCP handles congestion control by slowing down transmission with lost packets and speeding up with acknowledged packets. This happens by sending a single segment at a time, or the Maximum Segment Size (MSS). The MSS is doubled each time sent. If a packet gets lost, then a slow start threshold is implemented. If the congestion window is every larger than the threshold, then it enters a mode called "congestion avoidance mode." If the connection gets three duplicate ACKS, it enters a mode called "fast recovery mode." In layman's terms, messages increase slowly when successfully transmitted and then decrease it rapidly when there is congestion. 
+
+Question 3: NAT
+
+from A to X behind the NAT
+from B to X behind the NAT
+from A to X between the NAT and X
+from B to X between the NAT and X
+from X to A between X and the NAT
+from X to A between the NAT and A
+
+What there corresponding contents of the router's NAT translation table?
