@@ -343,7 +343,7 @@ void Var::print (ostream &ostream){
  * \param rhs The expression on the right-hand side whose value will be bound to lhs.
  * \param body The body of the Let expression where lhs may be used.
  */
-Let::Let(Var* lhs, Expr* rhs, Expr* body){
+Let::Let(string lhs, Expr* rhs, Expr* body){
     this->lhs = lhs;
     this->rhs = rhs;
     this->body = body;
@@ -360,7 +360,7 @@ bool Let::equals(Expr* e){
  if(_letPtr==nullptr){
         return false;
  }
- return this->lhs->equals(_letPtr->lhs) && this->rhs->equals(_letPtr->rhs) && this->body->equals(_letPtr->body);
+ return this->lhs==(_letPtr->lhs) && this->rhs->equals(_letPtr->rhs) && this->body->equals(_letPtr->body);
 }
 
 /**
@@ -373,7 +373,7 @@ int Let::interp(){
 
      Num* tempNum = new Num(rhsValue);
 
-     Expr* substitutedBody = body->subst(lhs->val, tempNum);
+     Expr* substitutedBody = body->subst(lhs, tempNum);
 
      return substitutedBody->interp();
 }
@@ -394,7 +394,7 @@ bool Let::has_variable(){
  */
 Expr* Let::subst(string str, Expr* e){
     // Check if the variable to substitute is the same as the Let's lhs
-       if (lhs->val == str) {
+       if (lhs == str) {
            // If yes, do not substitute within the body, as the Let's variable shadows it
            return new Let(lhs, rhs->subst(str, e), body);
        } else {
@@ -408,7 +408,7 @@ Expr* Let::subst(string str, Expr* e){
  * \param ostream The output stream to print to.
  */
 void Let::print(ostream &ostream){
-    ostream << "(_let " << lhs->val << "=" << rhs->to_string() << " _in " << body->to_string() << ")";
+    ostream << "(_let " << lhs << "=" << rhs->to_string() << " _in " << body->to_string() << ")";
 }
 
 /**
@@ -416,6 +416,19 @@ void Let::print(ostream &ostream){
  * \param ostream The output stream.
  * \param prec The current precedence level.
  */
-void Let::pretty_print_at(ostream &ostream, precedence_t prec){
-    
+void Let::pretty_print_at(ostream &ostream, precedence_t prec) {
+    streampos startPosition = ostream.tellp();
+
+    if (prec > prec_none) {
+        ostream << "(";
+    }
+
+    ostream << "_let " << lhs << " = ";
+    rhs->pretty_print_at(ostream, prec_none);
+    ostream << "\n" << string(startPosition, ' ') << "_in  ";
+    body->pretty_print_at(ostream, prec_none);
+
+    if (prec > prec_none) {
+        ostream << ")";
+    }
 }

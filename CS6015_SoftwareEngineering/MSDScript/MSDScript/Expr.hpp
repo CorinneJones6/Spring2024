@@ -132,11 +132,11 @@ public:
 class Let : public Expr {
     
 public:
-    Var* lhs;
+    string lhs;
     Expr* rhs;
     Expr* body;
     
-    Let(Var* lhs, Expr* rhs, Expr* body);
+    Let(string lhs, Expr* rhs, Expr* body);
 
     virtual bool equals(Expr* e);
     

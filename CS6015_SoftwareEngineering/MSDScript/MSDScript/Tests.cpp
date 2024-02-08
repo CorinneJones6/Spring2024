@@ -178,23 +178,23 @@ TEST_CASE("LET TESTS"){
     
     SECTION("Testing equals()"){
         //equal let expressions
-        Expr* letExpr1 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
-        Expr* letExpr2 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr1 = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr2 = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
         CHECK( letExpr1->equals(letExpr2) == true );
         
         //different lhs
-        Expr* letExpr3 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
-        Expr* letExpr4 = new Let(new Var("y"), new Num(5), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr3 = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr4 = new Let("y", new Num(5), new Add(new Var("x"), new Num(3)));
         CHECK( letExpr3->equals(letExpr4) == false );
         
         //different rhs
-        Expr* letExpr5 = new Let(new Var("x"), new Num(4), new Add(new Var("x"), new Num(3)));
-        Expr* letExpr6 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr5 = new Let("x", new Num(4), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr6 = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
         CHECK( letExpr5->equals(letExpr6) == false );
 
         //different body
-        Expr* letExpr7 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(2)));
-        Expr* letExpr8 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
+        Expr* letExpr7 = new Let("x", new Num(5), new Add(new Var("x"), new Num(2)));
+        Expr* letExpr8 = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
         CHECK( letExpr7->equals(letExpr8) == false );
     }
     
@@ -202,46 +202,51 @@ TEST_CASE("LET TESTS"){
         Var* varX = new Var("x");
         Expr* num5 = new Num(5);
         Expr* addExpr = new Add(varX, new Num(2));
-        CHECK( (new Let(varX, num5, addExpr))->interp() == 7 );
+        CHECK( (new Let("x", num5, addExpr))->interp() == 7 );
     }
     
     SECTION("Testing has_variable()"){
         //rhs variable present
-        CHECK( (new Let(new Var("x"), new Add(new Var("y"), new Num(1)), new Num(2)))->has_variable() == true );
+        CHECK( (new Let("x", new Add(new Var("y"), new Num(1)), new Num(2)))->has_variable() == true );
         
         //body variable present
-        CHECK( (new Let(new Var("x"), new Num(1), new Add(new Var("y"), new Num(2))))->has_variable() == true );
+        CHECK( (new Let("x", new Num(1), new Add(new Var("y"), new Num(2))))->has_variable() == true );
         
         //no variable present
-        CHECK( (new Let(new Var("x"), new Num(1), new Num(2)))->has_variable() == false );
+        CHECK( (new Let("x", new Num(1), new Num(2)))->has_variable() == false );
     }
     
     SECTION("Testing subst()"){
         //Substitution in rhs, not shadowed by Let's lhs
-        Let* letExpr = new Let(new Var("x"), new Add(new Var("y"), new Num(1)), new Var("x"));
+        Let* letExpr = new Let("x", new Add(new Var("y"), new Num(1)), new Var("x"));
         Expr* substituted = letExpr->subst("y", new Num(5));
-        CHECK( substituted->equals(new Let(new Var("x"), new Add(new Num(5), new Num(1)), new Var("x"))) == true );
+        CHECK( substituted->equals(new Let("x", new Add(new Num(5), new Num(1)), new Var("x"))) == true );
         
         //Substitution shadowed by Let's lhs
-        Let* letExpr1 = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
+        Let* letExpr1 = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
         Expr* substituted1 = letExpr1->subst("x", new Num(10));
-        CHECK( substituted1->equals(new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)))) == true );
+        CHECK( substituted1->equals(new Let("x", new Num(5), new Add(new Var("x"), new Num(3)))) == true );
         
         //Substitution in body, not shadowed
-        Let* letExpr2 = new Let(new Var("x"), new Num(5), new Add(new Var("y"), new Num(3)));
+        Let* letExpr2 = new Let("x", new Num(5), new Add(new Var("y"), new Num(3)));
         Expr* substituted2 = letExpr2->subst("y", new Num(2));
-        CHECK( substituted2->equals(new Let(new Var("x"), new Num(5), new Add(new Num(2), new Num(3)))) == true );
+        CHECK( substituted2->equals(new Let("x", new Num(5), new Add(new Num(2), new Num(3)))) == true );
     }
     
     SECTION("Testing print()"){
         std::ostringstream out;
-        Let* letExpr = new Let(new Var("x"), new Num(5), new Add(new Var("x"), new Num(3)));
+        Let* letExpr = new Let("x", new Num(5), new Add(new Var("x"), new Num(3)));
         letExpr->print(out);
         CHECK( out.str() == "(_let x=5 _in (x+3))" );
     }
     
     SECTION("Testing pretty_print()"){
-        
+
+        Let* innerLet = new Let("y", new Num(3), new Add(new Var("y"), new Num(2)));
+        Let* outerLet = new Let("x", new Num(5), new Add(innerLet, new Var("x")));
+        std::string expected = "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x";
+           
+        CHECK( outerLet->to_pretty_string()==expected );
     }
 }
 
