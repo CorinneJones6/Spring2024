@@ -418,14 +418,14 @@ void Let::print(ostream &ostream){
  */
 void Let::pretty_print_at(ostream &ostream, precedence_t prec) {
     streampos startPosition = ostream.tellp();
-
+    
     if (prec > prec_none) {
         ostream << "(";
     }
 
     ostream << "_let " << lhs << " = ";
     rhs->pretty_print_at(ostream, prec_none);
-    ostream << "\n" << string(startPosition, ' ') << "_in  ";
+    ostream << "\n" << string(startPosition/2, ' ') << "_in  ";
     body->pretty_print_at(ostream, prec_none);
 
     if (prec > prec_none) {
