@@ -245,7 +245,7 @@ TEST_CASE("LET TESTS"){
         Let* innerLet = new Let("y", new Num(3), new Add(new Var("y"), new Num(2)));
         Let* outerLet = new Let("x", new Num(5), new Add(innerLet, new Var("x")));
         std::string expected = "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x";
-           
+
         CHECK( outerLet->to_pretty_string()==expected );
     }
 }

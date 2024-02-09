@@ -13,9 +13,15 @@ public class Router {
 
     public void onInit() throws InterruptedException {
 
-        //TODO: IMPLEMENT ME
-        //As soon as the network is online,
-        //fill in your initial distance table and broadcast it to your neighbors
+        this.distances.put(this, 0);
+
+        for(Neighbor neighbor : Network.getNeighbors(this)){
+            this.distances.put(neighbor.router, neighbor.cost);
+        }
+
+        for(Neighbor neighbor: Network.getNeighbors(this)){
+            Network.sendDistanceMessage(new Message(this, neighbor.router, new HashMap<>(this.distances)));
+        }
     }
 
     public void onDistanceMessage(Message message) throws InterruptedException {
