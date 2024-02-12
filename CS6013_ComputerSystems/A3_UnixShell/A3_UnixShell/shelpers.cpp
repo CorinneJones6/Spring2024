@@ -262,14 +262,22 @@ vector<Command> getCommands( const vector<string> & tokens )
 
    if( error ){
 
-      // Close any file descriptors you opened in this function and return the appropriate data!
+       // Iterate through the commands to close any open file descriptors
+         for (auto &command : commands) {
+             if (command.inputFd != STDIN_FILENO && command.inputFd > 0) {
+                 close(command.inputFd);
+             }
+             if (command.outputFd != STDOUT_FILENO && command.outputFd > 0) {
+                 close(command.outputFd);
+             }
+         }
 
-      // Note, an error can happen while parsing any command. However, the "commands" vector is
-      // pre-populated with a set of "empty" commands and filled in as we go.  Because
-      // of this, a "command" name can be blank (the default for a command struct that has not
-      // yet been filled in).  (Note, it has not been filled in yet because the processing
-      // has not gotten to it when the error (in a previous command) occurred.
+         // Log an error message - this is just an example, adjust based on your logging approach
+         cerr << "Error processing commands. Check syntax and file descriptors." << endl;
 
+         // Optionally, clear the commands vector to return an empty list indicating error
+         commands.clear();
+       
       assert(false);
    }
 
