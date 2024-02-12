@@ -120,11 +120,11 @@ void Add::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, 
     if(prec >= prec_add){
         ostream << "(";
     }
-    lhs->pretty_print_at(ostream, prec_add, NULL, NULL);
+    lhs->pretty_print_at(ostream, prec_add, true, strmpos);
     
     ostream << " + ";
     
-    rhs->pretty_print_at(ostream, prec_none, NULL, NULL);
+    rhs->pretty_print_at(ostream, prec_none, false, strmpos);
     
     if(prec >= prec_add){
         ostream << ")";
@@ -204,11 +204,11 @@ void Mult::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent,
         ostream << "(";
     }
     
-    this->lhs->pretty_print_at(ostream, prec_mult, NULL, NULL);
+    this->lhs->pretty_print_at(ostream, prec_mult, true, strmpos);
     
     ostream << " * ";
     
-    this->rhs->pretty_print_at(ostream, prec_add, NULL, NULL);
+    this->rhs->pretty_print_at(ostream, prec_add, false, strmpos);
     
     if (prec >= prec_mult) {
         ostream << ")";
@@ -419,16 +419,25 @@ void Let::print(ostream &ostream){
 void Let::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos strmpos) {
     streampos startPosition = ostream.tellp();
     
-    if (prec > prec_none) {
+    streampos depth = startPosition-strmpos;
+    
+    if (let_parent) {
         ostream << "(";
     }
-
+    
     ostream << "_let " << lhs << " = ";
-    rhs->pretty_print_at(ostream, prec_none, NULL, NULL);
-    ostream << "\n" << string(startPosition, ' ') << "_in  ";
-    body->pretty_print_at(ostream, prec_none, NULL, NULL);
+    
+    rhs->pretty_print_at(ostream, prec_none, false, depth);
+    
+    ostream << "\n";
+    
+    streampos rc = ostream.tellp();
+    
+    ostream << string(depth, ' ') << " _in  ";
+   
+    body->pretty_print_at(ostream, prec_none, false, rc);
 
-    if (prec > prec_none) {
+    if (let_parent) {
         ostream << ")";
     }
 }

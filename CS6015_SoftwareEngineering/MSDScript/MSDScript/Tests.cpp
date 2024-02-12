@@ -241,12 +241,37 @@ TEST_CASE("LET TESTS"){
     }
     
     SECTION("Testing pretty_print()"){
+        
+    
 
         Let* innerLet = new Let("y", new Num(3), new Add(new Var("y"), new Num(2)));
         Let* outerLet = new Let("x", new Num(5), new Add(innerLet, new Var("x")));
-        std::string expected = "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x";
+        std::string expected = "_let x = 5\n _in  (_let y = 3\n       _in  y + 2) + x";
+//        std::string letExpected = "_let y = 3\n _in y + 2";
 
+//        CHECK( innerLet->to_pretty_string()== letExpected);
         CHECK( outerLet->to_pretty_string()==expected );
+        
+        //Let nested as right argument of parenthesized multiplication expression
+            CHECK ( (new Mult(new Mult(new Num (2), new Let("x", new Num(5), new Add(new Var("x") , new Num(1)) )), new Num(3)))->to_pretty_string() == "(2 * _let x = 5\n"
+                                                                                                                                                            "      _in  x + 1) * 3");
+            CHECK((new Mult(new Num(5), new Add(new Let("x", new Num(5), new Var("x")), new Num(1))))->to_pretty_string() == "5 * ((_let x = 5\n"
+                                                                                                                                                            "       _in  x) + 1)");
+            //Let in lhs of add
+            CHECK ( (new Add(new Let("x", new Num(2), new Add(new Var("x"), new Num(9))), new Num(4)))->to_pretty_string() == "(_let x = 2\n"
+                                                                                                                                                            "  _in  x + 9) + 4");
+            //Let in lhs of multiplication expression
+            CHECK((new Mult(new Let("x", new Num(5), new Add(new Var("x"), new Num(8))), new Num(3)))->to_pretty_string() == "(_let x = 5\n"
+                                                                                                                                                            "  _in  x + 8) * 3");
+        
+//        //new tests
+//
+//            CHECK ( (new Mult(new Mult(new Num (2), new Let("x", new Num(5), new Add(new Var("x") , new Num(1)) )), new Num(3)))
+//            ->to_pretty_string() == "(2 * _let x = 5\n"
+//                                "     _in  x + 1) * 3");
+//
+//            CHECK((new Let("x", new Num(5), new Add(new Let("y" , new Num(3), new Add(new Var("y"), new Num(2))), new Var("x"))))
+//            ->to_pretty_string() == "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x");
     }
 }
 
