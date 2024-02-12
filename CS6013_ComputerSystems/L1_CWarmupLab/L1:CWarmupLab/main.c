@@ -238,7 +238,7 @@ void draw_me()
     FILE *myPic;
     
     //dictates the path to store the result
-    myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1_CWarmupLab/MyPicture.txt", "w");
+    myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013_ComputerSystems/L1_CWarmupLab/MyPicture.txt", "w");
     //print to the file
     fprintf(myPic, "  ^_^\n");
     fprintf(myPic, "(>'.'<)\n");
@@ -338,7 +338,7 @@ bool testDrawMe(){
     
     draw_me();
     
-    FILE* myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013/L1_CWarmupLab/MyPicture.txt", "r");
+    FILE* myPic = fopen("/Users/corinnejones/GitHubSchool/Spring2024/CS6013_ComputerSystems/L1_CWarmupLab/MyPicture.txt", "r");
     if (myPic == NULL) {
         return false;
     }
