@@ -13,7 +13,7 @@ public class Router {
 
     public void onInit() throws InterruptedException {
 
-        this.distances.put(this, 0);
+        this.distances.put(this, 0); // initialize self with an integer of 0
 
         for(Neighbor neighbor : Network.getNeighbors(this)){
             this.distances.put(neighbor.router, neighbor.cost);
@@ -25,7 +25,37 @@ public class Router {
     }
 
     public void onDistanceMessage(Message message) throws InterruptedException {
-        //update your distance table and broadcast it to your neighbors if it changed
+        boolean updated = false;
+        HashMap<Router, Integer> senderDistanceTable = message.distances;
+        Router sender = message.sender;
+        Integer distanceToSender = this.distances.get(sender);
+
+        if(distanceToSender == null){
+            //handle if there is no distance to sender
+            distanceToSender = Integer.MAX_VALUE;
+            this.distances.put(sender, distanceToSender);
+        }
+
+        for (HashMap.Entry<Router, Integer> entry : senderDistanceTable.entrySet()) {
+
+            Router currentRouter = entry.getKey();
+            Integer currentDistance = entry.getValue();
+            Integer currentKnownDistance = this.distances.getOrDefault(currentRouter, Integer.MAX_VALUE);
+
+            int calculatedDistance = currentDistance + distanceToSender;
+
+            if(calculatedDistance < currentKnownDistance){
+                this.distances.put(currentRouter, calculatedDistance);
+                updated = true;
+            }
+        }
+
+        if(updated) {
+            //send updated message to all others
+            for (Neighbor neighbor : Network.getNeighbors(this)) {
+                Network.sendDistanceMessage(new Message(this, neighbor.router, new HashMap<>(this.distances)));
+            }
+        }
     }
 
 
