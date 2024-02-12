@@ -433,7 +433,7 @@ void Let::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, 
     
     streampos rc = ostream.tellp();
     
-    ostream << string(depth, ' ') << " _in  ";
+    ostream << string(depth, ' ') << " _in ";
    
     body->pretty_print_at(ostream, prec_none, false, rc);
 
