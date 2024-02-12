@@ -1,6 +1,7 @@
 # Define variables
 CXX = c++
 CFLAGS = --std=c++11
+LDFLAGS = -lreadline
 LINKER = -o
 CXXSOURCE = main.cpp shelpers.cpp
 HEADERS = shelpers.hpp
@@ -14,7 +15,7 @@ all: program
 
 # Link the object files to create the executable
 program: $(OBJFILES)
-	$(CXX) $(CFLAGS) $(LINKER) $@ $^
+	$(CXX) $(CFLAGS) $(LINKER) $@ $^ $(LDFLAGS)
 
 # Defines a target for cleaning up the project
 .PHONY: clean
