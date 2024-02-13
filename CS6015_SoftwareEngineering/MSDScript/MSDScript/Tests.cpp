@@ -212,6 +212,15 @@ TEST_CASE("LET TESTS"){
         //body variable present
         CHECK( (new Let("x", new Num(1), new Add(new Var("y"), new Num(2))))->has_variable() == true );
         
+        //nested let variable present
+        CHECK( (new Add (new Mult(new Num(4), new Let("x", new Num(5), new Add(new Var("x"), new Num(1)))), new Num(9)))->has_variable() == true );
+        
+        //nested let variable not present
+        CHECK( (new Mult(new Mult(new Num (2), new Let("x", new Num(5), new Add(new Num(2) , new Num(1)) )), new Num(3)))->has_variable() == false);
+        
+        //nested let variable not present 
+        CHECK( (new Let("x", new Num(1), new Let("y", new Num(1),new Num(1))))->has_variable()==false);
+        
         //no variable present
         CHECK( (new Let("x", new Num(1), new Num(2)))->has_variable() == false );
     }
@@ -251,6 +260,7 @@ TEST_CASE("LET TESTS"){
         //Let nested as right argument of parenthesized multiplication expression
         CHECK ( (new Mult(new Mult(new Num (2), new Let("x", new Num(5), new Add(new Var("x") , new Num(1)) )), new Num(3)))->to_pretty_string() == "(2 * _let x = 5\n"
                                                                                         "      _in x + 1) * 3");
+        
         CHECK((new Mult(new Num(5), new Add(new Let("x", new Num(5), new Var("x")), new Num(1))))->to_pretty_string() == "5 * ((_let x = 5\n"
                                                                                         "      _in x) + 1)");
         //Let in lhs of add
