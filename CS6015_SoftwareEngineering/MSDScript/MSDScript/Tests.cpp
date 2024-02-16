@@ -218,7 +218,7 @@ TEST_CASE("LET TESTS"){
         //nested let variable not present
         CHECK( (new Mult(new Mult(new Num (2), new Let("x", new Num(5), new Add(new Num(2) , new Num(1)) )), new Num(3)))->has_variable() == false);
         
-        //nested let variable not present 
+        //nested let variable not present
         CHECK( (new Let("x", new Num(1), new Let("y", new Num(1),new Num(1))))->has_variable()==false);
         
         //no variable present
