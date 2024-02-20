@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "Expr.hpp"
 #include "catch.h"
+#include "parse.hpp"
 
 
 TEST_CASE("NUM TESTS"){
@@ -272,7 +273,7 @@ TEST_CASE("LET TESTS"){
         
         //Let nest as right argument of un-parenthesized multiplication expression
         CHECK((new Add (new Mult(new Num(4), new Let("x", new Num(5), new Add(new Var("x"), new Num(1)))), new Num(9)))->to_pretty_string() == "4 * (_let x = 5\n"
-                                                                                 "      _in x + 1) + 9");
+                                                                                 "     _in x + 1) + 9");
       
         CHECK( (new Let("x",new Num(5), new Add(new Let("y", new Num(3), new Add(new Var("y"), new Num(2 ))), new Var("x"))))->to_pretty_string() == "_let x = 5\n _in (_let y = 3\n      _in y + 2) + x");
     }
@@ -312,6 +313,51 @@ TEST_CASE("LET TESTS"){
 //                          "       _in  y + _let z = 6\n"
 //                          "                _in  a + 8) + x" );
 //    }
+}
+
+TEST_CASE("parse") {
+  CHECK_THROWS_WITH( parse_str("()"), "invalid input" );
+  
+  CHECK( parse_str("(1)")->equals(new Num(1)) );
+  CHECK( parse_str("(((1)))")->equals(new Num(1)) );
+  
+  CHECK_THROWS_WITH( parse_str("(1"), "missing close parenthesis" );
+  
+  CHECK( parse_str("1")->equals(new Num(1)) );
+  CHECK( parse_str("10")->equals(new Num(10)) );
+  CHECK( parse_str("-3")->equals(new Num(-3)) );
+  CHECK( parse_str("  \n 5  ")->equals(new Num(5)) );
+  CHECK_THROWS_WITH( parse_str("-"), "not a num" );
+
+  // This was some temporary debugging code:
+  //  std::istringstream in("-");
+  //  parse_num(in)->print(std::cout); std::cout << "\n";
+  
+  CHECK_THROWS_WITH( parse_str(" -   5  "), "not a num" );
+  
+  CHECK( parse_str("x")->equals(new Var("x")) );
+  CHECK( parse_str("xyz")->equals(new Var("xyz")) );
+  CHECK( parse_str("xYz")->equals(new Var("xYz")) );
+  CHECK_THROWS_WITH( parse_str("x_z"), "invalid input" );
+  
+  CHECK( parse_str("x + y")->equals(new Add(new Var("x"), new Var("y"))) );
+
+  CHECK( parse_str("x * y")->equals(new Mult(new Var("x"), new Var("y"))) );
+
+  CHECK( parse_str("z * x + y")
+        ->equals(new Add(new Mult(new Var("z"), new Var("x")),
+                         new Var("y"))) );
+  
+  CHECK( parse_str("z * (x + y)")
+        ->equals(new Mult(new Var("z"),
+                          new Add(new Var("x"), new Var("y"))) ));
+    
+  CHECK( parse_str("_let x = 5 _in x + 3")
+           ->equals(new Let("x", new Num(5), new Add(new Var("x"), new Num(3)))) );
+    
+  CHECK( parse_str("_let x = 2 _in _let y = x + 3 _in y * x") ->equals(new Let("x", new Num(2),
+        new Let("y", new Add(new Var("x"), new Num(3)), new Mult(new Var("y"), new Var("x"))))) );
+
 }
 
            

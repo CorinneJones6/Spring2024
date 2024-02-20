@@ -27,7 +27,7 @@ string Expr::to_string(){
  * \param ostream The output stream to print to.
  * \param prec The precedence context in which to print.
  */
-void Expr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos strmpos){
+void Expr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos){
     print(ostream);
 }
 
@@ -36,7 +36,8 @@ void Expr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent,
  * \param ostream The output stream.
  */
 void Expr::pretty_print(ostream &ostream){
-    pretty_print_at(ostream, prec_none, NULL, NULL);
+    streampos strmpos = 0;
+    pretty_print_at(ostream, prec_none, false, strmpos);
 }
 
 /**
@@ -116,7 +117,7 @@ void Add::print(ostream &ostream){
  * \param ostream The output stream.
  * \param prec The precedence level.
  */
-void Add::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos strmpos) {
+void Add::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
     if(prec >= prec_add){
         ostream << "(";
     }
@@ -124,7 +125,7 @@ void Add::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, 
     
     ostream << " + ";
     
-    rhs->pretty_print_at(ostream, prec_none, false, strmpos);
+    rhs->pretty_print_at(ostream, prec_none, let_parent, strmpos);
     
     if(prec >= prec_add){
         ostream << ")";
@@ -199,16 +200,18 @@ void Mult::print (ostream &ostream){
  * \param ostream The output stream.
  * \param prec The current precedence level.
  */
-void Mult::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos strmpos) {
+void Mult::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
+    bool parent = let_parent;
     if (prec >= prec_mult) {
         ostream << "(";
+        parent = false;
     }
     
     this->lhs->pretty_print_at(ostream, prec_mult, true, strmpos);
     
     ostream << " * ";
     
-    this->rhs->pretty_print_at(ostream, prec_add, false, strmpos);
+    this->rhs->pretty_print_at(ostream, prec_add, parent, strmpos);
     
     if (prec >= prec_mult) {
         ostream << ")";
@@ -416,7 +419,7 @@ void Let::print(ostream &ostream){
  * \param ostream The output stream.
  * \param prec The current precedence level.
  */
-void Let::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos strmpos) {
+void Let::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
     streampos startPosition = ostream.tellp();
     
     streampos depth = startPosition-strmpos;

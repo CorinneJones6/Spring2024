@@ -13,22 +13,32 @@
 
 int main(int argc, char **argv) {
 
-  use_arguments(argc, argv);
+  run_mode_t type = use_arguments(argc, argv);
+    
+    switch(type) {
+        case do_nothing:
+            break;
+        case do_interp: {
+            Expr *e = parse(cin);
+            int i = e->interp();
+            cout << i << "\n";
+            break;
+        }
+        case do_print: {
+            Expr *e = parse(cin);
+            string str = e->to_string();
+            cout << str << "\n";
+            break;
+        }
+        case do_pretty_print: {
+            Expr *e = parse(cin);
+            string str = e->to_pretty_string();
+            cout << str << "\n";
+            break;
+        }
+    }
     
   cout << "All requirements completed, now exiting." << endl;
-    
-//    while(1){
-//        Expr *e = parse_expr(cin);
-//        
-//        e->pretty_print(cout);
-//        cout << "\n";
-//        
-//        skip_whitespace(cin);
-//        
-//        if(cin.eof()){
-//            break; 
-//        }
-//    }
 
   return 0;
 }

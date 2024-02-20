@@ -17,36 +17,50 @@
 #include "catch.h"
 #include "cmdline.hpp"
 
-void use_arguments(int argc, char **argv){
-  string helpTag = "--help";
-  string testTag = "--test";
+run_mode_t use_arguments(int argc, char **argv){
+  string helpTg = "--help";
+  string testTg = "--test";
+  string interpTg = "--interp";
+  string printTg = "--print";
+  string prettyPrintTg = "--pretty-print";
+  string tags[5]={helpTg, testTg, interpTg, printTg, prettyPrintTg};
+    
   int length = argc;
-  bool canTest = true;
 
   for (int i=1; i<length; i++){
     string s = argv[i];
     
-    if(s==helpTag){
+    if(s==helpTg){
         cout << "You can use the following tags: " << endl;
-        cout << "--help" << endl;
-        cout << "--test" << endl;
+        for(string s : tags){
+            cout << s <<endl;
+        }
         exit(0);
     }
-    else if(s==testTag){
-        if(!canTest){
-            cerr << "Already tested" << endl;
-            exit(1);
-        }
-      else if (canTest) {
+    else if(s==testTg){
           if (Catch::Session().run(1, argv)!= 0){
+              cerr << "Tests did not pass" << endl;
               exit(1);
           }
-          canTest = false;
-      }
+          else{
+              cout << "Tests passed!" << endl;
+              exit(0);
+          }
+    }
+    else if(s==interpTg){
+        return do_interp;
+    }
+    else if(s==printTg){
+        return do_print;
+    }
+    else if(s==prettyPrintTg){
+        return do_pretty_print;
     }
     else {
       cout << "Invalid argument provided" << endl;
+      return do_nothing;
     }
   }
+    return do_nothing;
 };
 
