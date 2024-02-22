@@ -209,6 +209,17 @@ Expr* parse_var(istream &in) {
     return new Var(str);
 }
 
+/**
+ * \brief Consumes a specified string from the input stream.
+ *
+ * This function reads characters from the input stream until it matches
+ * the characters in the given string, throwing a runtime_error if a
+ * mismatch is encountered.
+ *
+ * \param in The input stream to consume characters from.
+ * \param str The string to be consumed from the input stream.
+ * \throws runtime_error If a character mismatch occurs during consumption.
+ */
 static void consume_word(istream &in, string str){
     for(char c : str){
         if (in.get()!=c){
@@ -217,6 +228,15 @@ static void consume_word(istream &in, string str){
     }
 }
 
+/**
+ * \brief Parses a _let expression from the input stream.
+ *
+ * This function parses a _let expression from the input stream, constructing
+ * a Let object with the parsed components.
+ *
+ * \param in The input stream to parse from.
+ * \return A pointer to the Let expression object.
+ */
 Expr* parse_let(istream &in){
     
     skip_whitespace(in);
