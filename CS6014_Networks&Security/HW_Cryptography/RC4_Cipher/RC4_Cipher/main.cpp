@@ -45,7 +45,7 @@ struct R64Cipher {
             stateArr[k] = k;
         }
         
-        // Key Scheduling Algorithm (KSA)
+        // Key Scheduling Algorithm
         for (int k = 0, j = 0; k < 256; ++k) {
             j = (j + stateArr[k] + key[k % key.length()]) % 256;
             swap(stateArr[k], stateArr[j]);
@@ -80,7 +80,7 @@ struct R64Cipher {
         return stateArr[(stateArr[i] + stateArr[j]) % 256];
     }
     
-    string encryptDecrypt(const string& input, const string& key) {
+    string encryptDecrypt(const string& input) {
         R64Cipher cipher(key);
         string output = input;
 
@@ -105,13 +105,12 @@ int main(int argc, const char * argv[]) {
    
     string key1 = "Key";
     string key2 = "NotKey";
+    string salaryMessage = "Your salary is $1000"; //used for part three
     
-    R64Cipher cipher(key1);
-    
-    int nextByte = cipher.next_byte();
-    
-    cout << "Next byte: " << nextByte << endl;
-    
+    R64Cipher cipher1(key1);
+    R64Cipher cipher2 (key2);
+    R64Cipher cipher3 ("salaryKey"); //used for part three
+   
     /**
      * Verify that decrypting a message with a different key than the encryption key does
      * not reveal the plaintext.
@@ -119,44 +118,43 @@ int main(int argc, const char * argv[]) {
      * Also verify that using the same key does reveal the plaintext.
      *
      */
-    
     string originalText = "Hello, world!";
     
-    string encryptedText =  cipher.encryptDecrypt(originalText, key1);
+    string encrypted1 =  cipher1.encryptDecrypt(originalText);
     
-    string decryptedText = cipher.encryptDecrypt(encryptedText, key1);
+    string decrypted1 = cipher1.encryptDecrypt(encrypted1);
     
-    string decryptedTextWrongKey = cipher.encryptDecrypt(encryptedText, key2);
+    string decrypted2 = cipher2.encryptDecrypt(decrypted1);
     
-    cout << "Message after encryption: " << encryptedText << endl;
-    cout << "Message after decryption: " << decryptedText << endl;
-    cout << "Message after decryption with wrong key: " << decryptedTextWrongKey << endl;
+    cout << "PART ONE" << endl;
+    cout << "Message after encryption: " << encrypted1 << endl;
+    cout << "Message after decryption with correct key: " << decrypted1 << endl;
+    cout << "Message after decryption with wrong key: " << decrypted2 << endl;
+    cout << endl;
     
     /**
      * Verify that encrypting 2 messages using the same keystream is insecure. What do
      * you expect to see if you xor the two encrypted messages?
      *
      */
-    
     string message1 = "Message one";
     string message2 = "Message two";
 
-    string encrypted1 = cipher.encryptDecrypt(message1, key1);
-    string encrypted2 = cipher.encryptDecrypt(message2, key1);
+    string encrypted2 = cipher1.encryptDecrypt(message1);
+    string encrypted3 = cipher1.encryptDecrypt(message2);
 
     string xoredMessages;
-    
-    for (int i = 0; i < encrypted1.size(); i++) {
-        xoredMessages += encrypted1[i] ^ encrypted2[i];
+
+    for (int i = 0; i < encrypted3.size(); i++) {
+        xoredMessages += encrypted2[i] ^ encrypted3[i];
     }
-    
-    string output = cipher.encryptDecrypt(message1, xoredMessages);
-    
+
+    cout << "PART TWO" << endl;
     cout << "Encrypted 1: " << encrypted1 << endl;
     cout << "Encrypted 2: " << encrypted2 << endl;
     cout << "XORed Message: " << xoredMessages << endl;
-    cout << "Output: " << output << endl;
-    
+    cout << endl;
+
     /**
      * Modify part of a message using a bit-flipping attack. For example, try sending the
      * message "Your salary is $1000" encrypted with RC4. Modify the ciphertext so that
@@ -164,18 +162,17 @@ int main(int argc, const char * argv[]) {
      * require using xor.
      *
      */
-    
-    string salaryMessage = "Your salary is $1000";
-    string encryptedSalary = cipher.encryptDecrypt(salaryMessage, "salaryKey");
+    string encryptedSalary = cipher3.encryptDecrypt(salaryMessage);
 
-    // Assuming you know the position of "1000" in the message and want to change it to "9999"
-    for (int i = 0; i < 4; i++) { // "1000" and "9999" have the same length
+    for (int i = 0; i < 4; i++) {
         encryptedSalary[salaryMessage.find("1000") + i] ^= "1000"[i] ^ "9999"[i];
     }
 
-    string modifiedSalaryMessage = cipher.encryptDecrypt(encryptedSalary, "salaryKey");
-    
-    cout << modifiedSalaryMessage << endl;
-    
+    string modifiedSalaryMessage = cipher3.encryptDecrypt(encryptedSalary);
+
+    cout << "PART THREE" << endl;
+    cout << "Message before modification: " << salaryMessage << endl;
+    cout << "Message after modification: " << modifiedSalaryMessage << endl;
+
     return 0;
 }
