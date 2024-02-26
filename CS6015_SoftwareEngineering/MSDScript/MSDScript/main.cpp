@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
             }
         }
         
-        cout << "All requirements completed, now exiting." << endl;
+//        cout << "All requirements completed, now exiting." << endl;
         
         return 0;
     }

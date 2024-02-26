@@ -34,3 +34,13 @@ run test: msdscript
 
 doc: msdscript
 	cd documentation && doxygen
+	
+# 'make test_msdscript' will create an executable for random test generation
+test_msdscript: test_msdscript.o exec.o expr.o
+	$(CXX) expr.o exec.o test_msdscript.o -o test_msdscript
+
+test_msdscript.o: test_msdscript.cpp
+	$(CXX) $(CFLAGS) -c test_msdscript.cpp -o test_msdscript.o
+
+exec.o: exec.cpp exec.hpp
+	$(CXX) $(CFLAGS) -c exec.cpp -o exec.o
