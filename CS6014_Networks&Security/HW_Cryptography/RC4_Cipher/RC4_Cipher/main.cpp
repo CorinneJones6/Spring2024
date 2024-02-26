@@ -136,9 +136,11 @@ int main(int argc, const char * argv[]) {
      * Verify that encrypting 2 messages using the same keystream is insecure. What do
      * you expect to see if you xor the two encrypted messages?
      *
+     *If you xor two messages that are the same, you would want it to be blank. If you xor
+     *two message that are NOT the same, it would still look like jibberish. 
      */
-    string message1 = "Message one";
-    string message2 = "Message two";
+    string message1 = "My name is Corinne";
+    string message2 = "My name is Corinne";
 
     string encrypted2 = cipher1.encryptDecrypt(message1);
     string encrypted3 = cipher1.encryptDecrypt(message2);
