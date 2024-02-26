@@ -1,9 +1,9 @@
-//
-//  main.cpp
-//  Cryptography
-//
-//  Created by Corinne Jones on 2/21/24.
-//
+/**
+* @file main.cpp
+* @brief Implementation of a (bad) block cipher.
+*
+* Created by Corinne Jones on 2/21/24.
+*/
 
 #include <iostream>
 
@@ -215,10 +215,17 @@ string decryptMessage(Block encryptMsg, vector<vector<uint8_t>> substTables, Blo
 }
 
 int main(int argc, const char * argv[]) {
+    /**
+     * Verify that you can encrypt and decrypt messages using your program.
+     * Demonstrate that trying to decrypt a message using the wrong password
+     * (and therefore the wrong key) does not recover the plaintext message.
+     *
+     */
+    string correctPassword = "Howdy";
+    string wrongPassword = "Hello";
     
-    string password = "Howdy";
-    
-    Block key = generateKey(password);
+    Block correctKey = generateKey(correctPassword);
+    Block wrongKey = generateKey(wrongPassword);
     
     vector<vector<uint8_t>> substTables;
     
@@ -228,11 +235,28 @@ int main(int argc, const char * argv[]) {
     
     cout << "Message before encryption: " << origMsg << "\n";
     
-    Block encryptedMsg = encryptMessage(origMsg, substTables, key);
+    Block encryptedMsg = encryptMessage(origMsg, substTables, correctKey);
     
-    string decryptedMsg = decryptMessage(encryptedMsg, substTables, key);
+    string decryptedMsg = decryptMessage(encryptedMsg, substTables, correctKey);
     
-    cout << "Message after decryption: " << decryptedMsg << "\n";
+    string decryptedMsg2 = decryptMessage(encryptedMsg, substTables, wrongKey);
+    
+    cout << "Message after decryption with the correct key: " << decryptedMsg << "\n";
+    
+    cout << "Message after decryption with the wrong key: " << decryptedMsg2 << "\n";
+    
+    /**
+     * Try modifying 1 bit of the ciphertext and then decrypting with the correct passwords.
+     * What do you see?
+     *
+     * You see that you are able to modify the message. 
+     */
+    
+    encryptedMsg[0] ^= 1; // Flip the least significant bit in byte1
+    
+    string decryptedMsgAfterBitModification = decryptMessage(encryptedMsg, substTables, correctKey);
+    
+    cout << "Message after bit modification and decryption: " << decryptedMsgAfterBitModification << "\n";
     
     return 0;
 }
