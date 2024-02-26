@@ -214,7 +214,6 @@ string decryptMessage(Block encryptMsg, vector<vector<uint8_t>> substTables, Blo
     return message;
 }
 
-
 int main(int argc, const char * argv[]) {
     
     string password = "Howdy";
