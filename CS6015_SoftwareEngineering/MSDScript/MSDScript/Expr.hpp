@@ -3,7 +3,7 @@
  * \brief Declaration of expression classes for arithmetic operations.
  *
  * Defines the abstract base class Expr and its derived classes such as Add, Mult, Num, and Var.
- * These classes are used to construct and evaluate arithmetic expressions involving basic operations
+ * These classes are used to construct and evaluate arithmetic expressions involvingh basic operations
  * and variables. Includes functionality for equality checking, evaluation, variable substitution,
  * and pretty printing of expressions.
  *

@@ -82,7 +82,6 @@ Expr* parse_addend(istream &in) {
  * \return Pointer to the parsed expression object.
  */
 Expr* parse_multicand(istream &in) {
-    
     skip_whitespace(in);
     int c = in.peek();
     
@@ -144,7 +143,6 @@ Expr* parse_num(istream &in) {
 
     if (negative)
         n = n * -1;
-
     return new Num(n);
 }
 

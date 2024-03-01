@@ -400,7 +400,8 @@ Expr* Let::subst(string str, Expr* e){
        if (lhs == str) {
            // If yes, do not substitute within the body, as the Let's variable shadows it
            return new Let(lhs, rhs->subst(str, e), body);
-       } else {
+       }
+       else {
            // If not, substitute within both rhs and body
            return new Let(lhs, rhs->subst(str, e), body->subst(str, e));
        }
