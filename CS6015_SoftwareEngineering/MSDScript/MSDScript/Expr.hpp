@@ -19,6 +19,7 @@
 #include <sstream>
 
 using namespace std;
+class Val;
 
 typedef enum {
   prec_none,      // = 0
@@ -29,7 +30,7 @@ typedef enum {
 class Expr {
 public:
     virtual bool equals (Expr *e)=0;
-    virtual int interp()=0;
+    virtual Val* interp()=0;
     virtual bool has_variable()=0;
     virtual Expr* subst(string str, Expr* e)=0;
     virtual void print(ostream &ostream)=0;
@@ -43,17 +44,17 @@ public:
 
 //======================  ADD  ======================//
 
-class Add : public Expr {
+class AddExpr : public Expr {
     
 public:
     Expr* lhs;
     Expr* rhs;
     
-    Add(Expr* lhs, Expr* rhs);
+    AddExpr(Expr* lhs, Expr* rhs);
 
     virtual bool equals(Expr* e);
     
-    virtual int interp();
+    virtual Val* interp();
     
     virtual bool has_variable();
     
@@ -67,16 +68,16 @@ public:
 
 //======================  MULT  ======================//
 
-class Mult : public Expr {
+class MultExpr : public Expr {
 public:
     Expr* lhs;
     Expr* rhs;
 
-    Mult(Expr* lhs, Expr* rhs);
+    MultExpr(Expr* lhs, Expr* rhs);
 
     virtual bool equals(Expr* e);
     
-    virtual int interp();
+    virtual Val* interp();
     
     virtual bool has_variable();
     
@@ -90,15 +91,15 @@ public:
 
 //======================  NUM  ======================//
 
-class Num : public Expr {
+class NumExpr : public Expr {
 public:
     int val;
     
-    Num(int val);
+    NumExpr(int rep);
     
     virtual bool equals(Expr* e);
     
-    virtual int interp();
+    virtual Val* interp();
     
     virtual bool has_variable();
     
@@ -108,16 +109,16 @@ public:
     
 };
 
-class Var : public Expr {
+class VarExpr : public Expr {
     
 public:
     string val;
     
-    Var (string val);
+    VarExpr (string val);
     
     virtual bool equals(Expr* e);
     
-    virtual int interp();
+    virtual Val* interp();
     
     virtual bool has_variable();
     
@@ -129,18 +130,18 @@ public:
 
 //======================  LET  ======================//
 
-class Let : public Expr {
+class LetExpr : public Expr {
     
 public:
     string lhs;
     Expr* rhs;
     Expr* body;
     
-    Let(string lhs, Expr* rhs, Expr* body);
+    LetExpr(string lhs, Expr* rhs, Expr* body);
 
     virtual bool equals(Expr* e);
     
-    virtual int interp();
+    virtual Val* interp();
     
     virtual bool has_variable();
     

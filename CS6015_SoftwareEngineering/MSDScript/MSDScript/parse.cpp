@@ -44,7 +44,7 @@ Expr* parse_expr(istream &in) {
     if (c == '+') {
         consume(in, '+');
         Expr *rhs = parse_expr(in);
-        return new Add(e, rhs);
+        return new AddExpr(e, rhs);
     }
     else{
         return  e;
@@ -68,7 +68,7 @@ Expr* parse_addend(istream &in) {
         consume(in, '*');
         skip_whitespace(in) ;
         Expr *rhs = parse_addend(in);
-        return new Mult(e, rhs);
+        return new MultExpr(e, rhs);
     }
     else{
         return e ;
@@ -143,7 +143,7 @@ Expr* parse_num(istream &in) {
 
     if (negative)
         n = n * -1;
-    return new Num(n);
+    return new NumExpr(n);
 }
 
 /**
@@ -204,7 +204,7 @@ Expr* parse_var(istream &in) {
             break;
         }
     }
-    return new Var(str);
+    return new VarExpr(str);
 }
 
 /**
@@ -263,7 +263,7 @@ Expr* parse_let(istream &in){
     
     Expr *body = parse_expr(in);
     
-    return new Let(lhs, rhs, body);
+    return new LetExpr(lhs, rhs, body);
 }
 
 

@@ -7,6 +7,7 @@
 #include <iostream>
 #include "cmdline.hpp"
 #include "Expr.hpp"
+#include "Val.hpp"
 #include "parse.hpp"
 #include <string>
 #include <cstdlib>
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
                 break;
             case do_interp: {
                 Expr *e = parse(cin);
-                int i = e->interp();
+                Val* i = e->interp();
                 cout << i << "\n";
                 break;
             }
@@ -37,8 +38,6 @@ int main(int argc, char **argv) {
                 break;
             }
         }
-        
-//        cout << "All requirements completed, now exiting." << endl;
         
         return 0;
     }

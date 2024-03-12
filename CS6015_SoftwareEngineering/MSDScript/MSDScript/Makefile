@@ -2,9 +2,9 @@
 CXX = c++
 CFLAGS = --std=c++11
 LINKER = -o
-CXXSOURCE = cmdline.cpp Expr.cpp main.cpp Tests.cpp parse.cpp
-HEADERS = cmdline.hpp Expr.hpp catch.h parse.hpp
-OBJFILES = cmdline.o main.o Expr.o Tests.o parse.o
+CXXSOURCE = cmdline.cpp Expr.cpp main.cpp Tests.cpp parse.cpp Val.cpp
+HEADERS = cmdline.hpp Expr.hpp catch.h parse.hpp Val.hpp
+OBJFILES = cmdline.o main.o Expr.o Tests.o parse.o Val.o
 
 all: msdscript
 

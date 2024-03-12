@@ -9,6 +9,7 @@
  */
 
 #include "Expr.hpp"
+#include "Val.hpp"
 
 //====================== EXPR ======================//
 
@@ -57,7 +58,7 @@ string Expr::to_pretty_string(){
  * \param lhs Left-hand side expression.
  * \param rhs Right-hand side expression.
  */
-Add::Add(Expr* lhs, Expr* rhs) {
+AddExpr::AddExpr(Expr* lhs, Expr* rhs) {
     this->lhs = lhs;
     this->rhs = rhs;
 }
@@ -66,8 +67,8 @@ Add::Add(Expr* lhs, Expr* rhs) {
  * \param e The expression to compare with.
  * \return True if equal, false otherwise.
  */
-bool Add::equals(Expr* e) {
-    Add* addPtr = dynamic_cast<Add*>(e);
+bool AddExpr::equals(Expr* e) {
+    AddExpr* addPtr = dynamic_cast<AddExpr*>(e);
     if (addPtr == nullptr) {
         return false;
     }
@@ -78,15 +79,15 @@ bool Add::equals(Expr* e) {
  * \brief Interprets the addition of expressions.
  * \return The result of the addition.
  */
-int Add:: interp(){
-    return this->lhs->interp() + this->rhs->interp();
+Val* AddExpr:: interp(){
+    return this->lhs->interp()->add_to(this->rhs->interp());
 }
 
 /**
  * \brief Checks if the expression contains a variable.
  * \return True if a variable is present, false otherwise.
  */
-bool Add::has_variable(){
+bool AddExpr::has_variable(){
     return this->lhs->has_variable()||this->rhs->has_variable();
 }
 
@@ -96,15 +97,15 @@ bool Add::has_variable(){
  * \param e The expression to substitute with.
  * \return The new expression after substitution.
  */
-Expr* Add::subst(string str, Expr* e){
-    return new Add (this->lhs->subst(str, e), this->rhs->subst(str, e));
+Expr* AddExpr::subst(string str, Expr* e){
+    return new AddExpr (this->lhs->subst(str, e), this->rhs->subst(str, e));
 }
 
 /**
  * \brief Prints the addition expression.
  * \param ostream The output stream.
  */
-void Add::print(ostream &ostream){
+void AddExpr::print(ostream &ostream){
     ostream << "(";
     lhs->print(ostream);
     ostream << "+";
@@ -117,7 +118,7 @@ void Add::print(ostream &ostream){
  * \param ostream The output stream.
  * \param prec The precedence level.
  */
-void Add::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
+void AddExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
     if(prec >= prec_add){
         ostream << "(";
     }
@@ -139,7 +140,7 @@ void Add::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, 
  * \param lhs Left-hand side expression.
  * \param rhs Right-hand side expression.
  */
-Mult::Mult(Expr *lhs, Expr *rhs){
+MultExpr::MultExpr(Expr *lhs, Expr *rhs){
   this->lhs = lhs;
   this->rhs = rhs;
 }
@@ -149,8 +150,8 @@ Mult::Mult(Expr *lhs, Expr *rhs){
  * \param e The expression to compare with.
  * \return True if the expressions are equal, false otherwise.
  */
-bool Mult:: equals (Expr *e) {
-Mult* multPtr = dynamic_cast<Mult*>(e);
+bool MultExpr:: equals (Expr *e) {
+MultExpr* multPtr = dynamic_cast<MultExpr*>(e);
 if(multPtr==nullptr){
   return false;
 }
@@ -161,15 +162,15 @@ if(multPtr==nullptr){
  * \brief Evaluates the multiplication of the two expressions.
  * \return The integer result of the multiplication.
  */
-int Mult:: interp() {
-    return this->lhs->interp() * this->rhs->interp();
+Val* MultExpr:: interp() {
+    return this->lhs->interp()->mult_with(this->rhs->interp());
 }
 
 /**
  * \brief Determines if the expression contains a variable.
  * \return True if a variable is present, false otherwise.
  */
-bool Mult::has_variable() {
+bool MultExpr::has_variable() {
     return this->lhs->has_variable()||this->rhs->has_variable();
 }
 
@@ -179,15 +180,15 @@ bool Mult::has_variable() {
  * \param e The expression to replace it with.
  * \return A new expression with the substitution made.
  */
-Expr* Mult::subst(string str, Expr* e){
-    return new Mult (this->lhs->subst(str, e), this->rhs->subst(str, e));
+Expr* MultExpr::subst(string str, Expr* e){
+    return new MultExpr (this->lhs->subst(str, e), this->rhs->subst(str, e));
 }
 
 /**
  * \brief Prints the expression to the provided output stream.
  * \param ostream The output stream.
  */
-void Mult::print (ostream &ostream){
+void MultExpr::print (ostream &ostream){
     ostream << "(";
     this->lhs->print(ostream);
     ostream << "*";
@@ -200,7 +201,7 @@ void Mult::print (ostream &ostream){
  * \param ostream The output stream.
  * \param prec The current precedence level.
  */
-void Mult::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
+void MultExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
     bool parent = let_parent;
     if (prec >= prec_mult) {
         ostream << "(";
@@ -222,18 +223,18 @@ void Mult::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent,
 
 /**
  * \brief Initializes a numeric constant expression.
- * \param val The numeric value of the expression.
+ * \param rep The numeric value of the expression.
  */
-Num::Num (int val){
-  this->val = val;
+NumExpr::NumExpr (int rep){
+  this->val = rep;
 }
 /**
  * \brief Checks if this numeric constant is equal to another expression.
  * \param e A pointer to the expression to compare with this numeric constant.
  * \return True if the expressions are equal (i.e., if `e` is also a `Num` with the same value), false otherwise.
  */
-bool Num::equals (Expr *e) {
-  Num* numPtr = dynamic_cast<Num*>(e); // Check if 'e' is a 'Num' object
+bool NumExpr::equals (Expr *e) {
+  NumExpr* numPtr = dynamic_cast<NumExpr*>(e); // Check if 'e' is a 'Num' object
   if (numPtr == nullptr) {
       return false; // 'e' is not a 'Num' object
   }
@@ -244,15 +245,15 @@ bool Num::equals (Expr *e) {
  * \brief Evaluates to its numeric value.
  * \return The value of the numeric constant.
  */
-int Num:: interp(){
-    return this->val;
+Val* NumExpr:: interp(){
+    return new NumVal(val);
 }
 
 /**
  * \brief Checks if the numeric constant contains a variable.
  * \return False, as numeric constants do not contain variables.
  */
-bool Num::has_variable() {
+bool NumExpr::has_variable() {
     return false;
 }
 
@@ -262,7 +263,7 @@ bool Num::has_variable() {
  * \param e The expression to substitute in place of the variable.
  * \return A pointer to this numeric constant, as no substitution occurs.
  */
-Expr* Num::subst(string str, Expr* e){
+Expr* NumExpr::subst(string str, Expr* e){
     return this;
 }
 
@@ -270,7 +271,7 @@ Expr* Num::subst(string str, Expr* e){
  * \brief Prints the numeric value to the specified output stream.
  * \param ostream The output stream where the numeric value will be printed.
  */
-void Num::print (ostream &ostream){
+void NumExpr::print (ostream &ostream){
     ostream<<::to_string(val);
 }
 
@@ -280,7 +281,7 @@ void Num::print (ostream &ostream){
  * \brief Constructs a variable expression.
  * \param val The name of the variable.
  */
-Var::Var (string val){
+VarExpr::VarExpr (string val){
   this->val = val;
 }
 
@@ -289,8 +290,8 @@ Var::Var (string val){
  * \param e A pointer to the expression to compare with this variable expression.
  * \return True if `e` is a `Var` object with the same variable name, false otherwise.
  */
-bool Var::equals (Expr *e) {
-  Var* varPtr = dynamic_cast<Var*>(e); // Check if 'e' is a 'VarExpr' object
+bool VarExpr::equals (Expr *e) {
+  VarExpr* varPtr = dynamic_cast<VarExpr*>(e); // Check if 'e' is a 'VarExpr' object
   if (varPtr == nullptr) {
       return false; // 'e' is not a 'VarExpr' object
   }
@@ -301,17 +302,17 @@ bool Var::equals (Expr *e) {
  * \brief Throws an exception since variables cannot be directly interpreted.
  * \throws std::runtime_error when attempted to interpret a variable.
  */
-int Var::interp(){
+Val* VarExpr::interp(){
     throw std::runtime_error("Var cannot be converted to a number");
     
-    return 1;
+    return new NumVal(-1);
 }
 
 /**
  * \brief Checks if the expression contains a variable.
  * \return True, as this object represents a variable.
  */
-bool Var::has_variable() {
+bool VarExpr::has_variable() {
     return true;
 }
 
@@ -321,7 +322,7 @@ bool Var::has_variable() {
  * \param e The expression to substitute in place of the variable.
  * \return The original variable or the substitution.
  */
-Expr* Var::subst(string str, Expr* e){
+Expr* VarExpr::subst(string str, Expr* e){
     if(val==str){
         return e;
     }
@@ -334,7 +335,7 @@ Expr* Var::subst(string str, Expr* e){
  * \brief Prints the variable's name to the provided output stream.
  * \param ostream The output stream.
  */
-void Var::print (ostream &ostream){
+void VarExpr::print (ostream &ostream){
     ostream << val;
 }
 
@@ -346,7 +347,7 @@ void Var::print (ostream &ostream){
  * \param rhs The expression on the right-hand side whose value will be bound to lhs.
  * \param body The body of the Let expression where lhs may be used.
  */
-Let::Let(string lhs, Expr* rhs, Expr* body){
+LetExpr::LetExpr(string lhs, Expr* rhs, Expr* body){
     this->lhs = lhs;
     this->rhs = rhs;
     this->body = body;
@@ -357,8 +358,8 @@ Let::Let(string lhs, Expr* rhs, Expr* body){
  * \param e The expression to compare with.
  * \return True if both expressions are Let expressions with equal lhs, rhs, and body; otherwise false.
  */
-bool Let::equals(Expr* e){
- Let* _letPtr = dynamic_cast<Let*>(e);
+bool LetExpr::equals(Expr* e){
+ LetExpr* _letPtr = dynamic_cast<LetExpr*>(e);
     
  if(_letPtr==nullptr){
         return false;
@@ -370,22 +371,18 @@ bool Let::equals(Expr* e){
  * \brief Interprets the Let expression by evaluating rhs, substituting it into body, and then evaluating the result.
  * \return The integer result of interpreting the Let expression.
  */
-int Let::interp(){
+Val* LetExpr::interp(){
     
-     int rhsValue = rhs->interp();
-
-     Num* tempNum = new Num(rhsValue);
-
-     Expr* substitutedBody = body->subst(lhs, tempNum);
-
-     return substitutedBody->interp();
+    Val* rhsValue = rhs->interp();
+    
+    return body->subst(lhs, rhsValue->to_expr())->interp();
 }
 
 /**
  * \brief Determines if the Let expression contains a variable.
  * \return True if either rhs or body contains a variable; otherwise false.
  */
-bool Let::has_variable(){
+bool LetExpr::has_variable(){
     return this->rhs->has_variable()||this->body->has_variable();
 }
 
@@ -395,15 +392,15 @@ bool Let::has_variable(){
  * \param e The expression to replace str with.
  * \return A new Let expression with the substitution made.
  */
-Expr* Let::subst(string str, Expr* e){
+Expr* LetExpr::subst(string str, Expr* e){
     // Check if the variable to substitute is the same as the Let's lhs
        if (lhs == str) {
            // If yes, do not substitute within the body, as the Let's variable shadows it
-           return new Let(lhs, rhs->subst(str, e), body);
+           return new LetExpr(lhs, rhs->subst(str, e), body);
        }
        else {
            // If not, substitute within both rhs and body
-           return new Let(lhs, rhs->subst(str, e), body->subst(str, e));
+           return new LetExpr(lhs, rhs->subst(str, e), body->subst(str, e));
        }
 }
 
@@ -411,7 +408,7 @@ Expr* Let::subst(string str, Expr* e){
  * \brief Prints the Let expression to the provided output stream in a specific format.
  * \param ostream The output stream to print to.
  */
-void Let::print(ostream &ostream){
+void LetExpr::print(ostream &ostream){
     ostream << "(_let " << lhs << "=" << rhs->to_string() << " _in " << body->to_string() << ")";
 }
 
@@ -420,7 +417,7 @@ void Let::print(ostream &ostream){
  * \param ostream The output stream.
  * \param prec The current precedence level.
  */
-void Let::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
+void LetExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
     streampos startPosition = ostream.tellp();
     
     streampos depth = startPosition-strmpos;
