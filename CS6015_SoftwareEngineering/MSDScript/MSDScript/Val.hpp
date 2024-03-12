@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <string>
+#include "Expr.hpp"
 
 using namespace std;
 class Expr;
@@ -38,3 +39,16 @@ public:
     
 };
 
+class BoolVal : public Val {
+    public:
+    bool val;
+    
+    BoolVal(bool b);
+    
+    virtual Expr* to_expr();
+    virtual bool equals (Val *v);
+    virtual Val* add_to(Val* other_val);
+    virtual Val* mult_with(Val* other_val);
+    virtual void print(ostream &ostream);
+    
+};

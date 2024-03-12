@@ -154,4 +154,56 @@ public:
 };
 
 
+class BoolExpr : public Expr {
+public:
+    bool val;
+    
+    BoolExpr(bool b);
+    
+    virtual bool equals (Expr *e);
+    virtual Val* interp();
+    virtual bool has_variable();
+    virtual Expr* subst(string str, Expr* e);
+    virtual void print(ostream &ostream);
+    
+    virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
+};
+
+class IfExpr : public Expr {
+public:
+    Expr* if_;
+    
+    Expr* then_;
+    
+    Expr* else_ ;
+    
+    IfExpr(Expr* if_, Expr* then_, Expr* else_);
+    
+    virtual bool equals (Expr *e);
+    virtual Val* interp();
+    virtual bool has_variable();
+    virtual Expr* subst(string str, Expr* e);
+    virtual void print(ostream &ostream);
+    
+    virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
+    
+};
+
+class EqExpr : public Expr {
+public:
+    Expr* rhs;
+    Expr* lhs;
+    
+    EqExpr(Expr* rhs, Expr* lhs);
+    
+    virtual bool equals (Expr *e);
+    virtual Val* interp();
+    virtual bool has_variable();
+    virtual Expr* subst(string str, Expr* e);
+    virtual void print(ostream &ostream);
+    
+    virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
+};
+
+
 

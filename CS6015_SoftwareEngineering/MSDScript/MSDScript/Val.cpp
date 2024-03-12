@@ -6,7 +6,8 @@
 //
 
 #include "Val.hpp"
-#include "Expr.hpp"
+
+//======================  NumVal  ======================//
 
 string Val::to_string(){
     stringstream st("");
@@ -47,4 +48,37 @@ void NumVal::print (ostream &ostream){
     ostream<<::to_string(val);
 }
 
+//======================  BoolVal  ======================//
 
+BoolVal::BoolVal(bool b){
+    val = b;
+}
+
+Expr* BoolVal::to_expr(){
+    return new BoolExpr(this->val);
+}
+
+bool BoolVal::equals (Val *v){
+    BoolVal* boolPtr = dynamic_cast<BoolVal*>(v);
+    
+    if (boolPtr == nullptr){
+        return false;
+    }
+    return this->val == boolPtr->val;
+}
+
+Val* BoolVal::add_to(Val* other_val){
+    throw runtime_error("Bool cannot be added");
+    
+    return new NumVal(-1);
+}
+
+Val* BoolVal::mult_with(Val* other_val){
+    throw runtime_error("Bool cannot be multiplied");
+    
+    return new NumVal(-1);
+}
+
+void BoolVal::print(ostream &ostream){
+    ostream<<::to_string(val);
+}
