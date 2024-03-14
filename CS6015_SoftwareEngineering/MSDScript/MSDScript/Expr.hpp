@@ -109,6 +109,8 @@ public:
     
 };
 
+//======================  VarExpr  ======================//
+
 class VarExpr : public Expr {
     
 public:
@@ -128,7 +130,7 @@ public:
     
 };
 
-//======================  LET  ======================//
+//======================  LetExpr  ======================//
 
 class LetExpr : public Expr {
     
@@ -153,6 +155,7 @@ public:
     
 };
 
+//======================  BoolExpr  ======================//
 
 class BoolExpr : public Expr {
 public:
@@ -169,12 +172,12 @@ public:
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
 };
 
+//======================  IfExpr  ======================//
+
 class IfExpr : public Expr {
 public:
     Expr* if_;
-    
     Expr* then_;
-    
     Expr* else_ ;
     
     IfExpr(Expr* if_, Expr* then_, Expr* else_);
@@ -188,6 +191,8 @@ public:
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
     
 };
+
+//======================  EqExpr  ======================//
 
 class EqExpr : public Expr {
 public:

@@ -28,6 +28,7 @@ run_mode_t use_arguments(int argc, char **argv){
   int length = argc;
 
   for (int i=1; i<length; i++){
+      
     string s = argv[i];
     
     if(s==helpTg){

@@ -296,41 +296,60 @@ TEST_CASE("LET TESTS"){
               "      _in  y + 2) + x" );
     }
     
-//    SECTION("More pretty print"){
-//        //Let nested as right argument of parenthesized multiplication expression
-//        CHECK ( (new Mult(new Mult(new Num (2), new Let("x", new Num(5), new Add(new Var("x") , new Num(1)) )), new Num(3)))->to_pretty_string()== "(2 * _let x = 5\n"
-//        "      _in  x + 1) * 3");
-//        //Let nested to the left in add expression which is nested to the right within a multiplication expression
-//        CHECK((new Mult(new Num(5), new Add(new Let("x", new Num(5), new Var("x")), new Num(1))))->to_pretty_string() == "5 * ((_let x = 5\n"
-//        "       _in  x) + 1)");
-//        //Let in lhs of add
-//        CHECK ( (new Add(new Let("x", new Num(2), new Add(new Var("x"), new Num(9))), new Num(4)))->to_pretty_string() == "(_let x = 2\n"
-//        "  _in  x + 9) + 4");
-//        //Let in lhs of multiplication expression
-//        CHECK((new Mult(new Let("x", new Num(5), new Add(new Var("x"), new Num(8))), new Num(3)))->to_pretty_string() == "(_let x = 5\n"
-//        "  _in  x + 8) * 3");
-//        //Let nest as right argument of un-parenthesized multiplication expression
-//        CHECK((new Add (new Mult(new Num(4), new Let("x", new Num(5), new Add(new Var("x"), new Num(1)))), new Num(9)))->to_pretty_string() == "4 * (_let x = 5\n"
-//        "      _in  x + 1) + 9");
-//        //Let nested to the left within let that is nested to the left within add
-//        CHECK ((new Add(new Let("x", new Num(3), new Let("y", new Num(3), new Add(new Var("y"), new Num(2))) ), new Var("x")))->to_pretty_string() == "(_let x = 3\n"
-//                                                                                                                                                                   "  _in  _let y = 3\n"
-//                                                                                                                                                                   "       _in  y + 2) + x");
-//        //Let nested in lhs of Add expression nested within body of let expression
-//        CHECK((new Let("x", new Num(5), new Add(new Let("y" , new Num(3), new Add(new Var("y"), new Num(2))), new Var("x"))))
-//        ->to_pretty_string() == "_let x = 5\n"
-//                           " _in  (_let y = 3\n"
-//                           "       _in  y + 2) + x");
-//        //Triple nested let
-//        CHECK( ( new Let( "x", new Num(5),
-//                              new Add( new Let( "y", new Num(3),
-//                                                    new Add( new Var("y"), new Let("z",new Num(6),
-//                                                                                            new Add(new Var("a"), new Num(8))) ) ), new Var("x") ) ) )
-//        ->to_pretty_string()== "_let x = 5\n"
-//                          " _in  (_let y = 3\n"
-//                          "       _in  y + _let z = 6\n"
-//                          "                _in  a + 8) + x" );
-//    }
+    SECTION("More pretty print"){
+        
+        //Let nested as right argument of parenthesized multiplication expression
+        CHECK ( (new MultExpr(new MultExpr(new NumExpr(2), new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x") , new NumExpr(1)) )), new NumExpr(3)))->to_pretty_string()
+               ==
+               "(2 * _let x = 5\n"
+               "     _in  x + 1) * 3");
+        
+        //Let nested to the left in add expression which is nested to the right within a multiplication expression
+        CHECK((new MultExpr(new NumExpr(5), new AddExpr(new LetExpr("x", new NumExpr(5), new VarExpr("x")), new NumExpr(1))))->to_pretty_string()
+              ==
+              "5 * ((_let x = 5\n"
+              "      _in  x) + 1)");
+        
+        //Let in lhs of add
+        CHECK ( (new AddExpr(new LetExpr("x", new NumExpr(2), new AddExpr(new VarExpr("x"), new NumExpr(9))), new NumExpr(4)))->to_pretty_string()
+               ==
+               "(_let x = 2\n"
+               " _in  x + 9) + 4");
+
+        //Let in lhs of multiplication expression
+        CHECK((new MultExpr(new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(8))), new NumExpr(3)))->to_pretty_string()
+              ==
+              "(_let x = 5\n"
+              " _in  x + 8) * 3");
+
+        //Let nest as right argument of un-parenthesized multiplication expression
+        CHECK((new AddExpr(new MultExpr(new NumExpr(4), new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(1)))), new NumExpr(9)))->to_pretty_string()
+              ==
+              "4 * (_let x = 5\n"
+              "     _in  x + 1) + 9");
+
+        //Let nested to the left within let that is nested to the left within add
+        CHECK ((new AddExpr(new LetExpr("x", new NumExpr(3), new LetExpr("y", new NumExpr(3), new AddExpr(new VarExpr("y"), new NumExpr(2))) ), new VarExpr("x")))->to_pretty_string()
+               ==
+               "(_let x = 3\n"
+               " _in  _let y = 3\n"
+               "      _in  y + 2) + x");
+        
+        //Let nested in lhs of Add expression nested within body of let expression
+        CHECK((new LetExpr("x", new NumExpr(5), new AddExpr(new LetExpr("y" , new NumExpr(3), new AddExpr(new VarExpr("y"), new NumExpr(2))), new VarExpr("x"))))->to_pretty_string()
+              ==
+              "_let x = 5\n"
+              "_in  (_let y = 3\n"
+              "      _in  y + 2) + x");
+        
+        //Triple nested let
+        CHECK( ( new LetExpr( "x", new NumExpr(5), new AddExpr( new LetExpr( "y", new NumExpr(3), new AddExpr( new VarExpr("y"), new LetExpr("z", new NumExpr(6),new AddExpr(new VarExpr("a"), new NumExpr(8))) ) ), new VarExpr("x") ) ) )->to_pretty_string()
+              ==
+              "_let x = 5\n"
+              "_in  (_let y = 3\n"
+              "      _in  y + _let z = 6\n"
+              "               _in  a + 8) + x" );
+    }
 }
 
 TEST_CASE("parse") {
@@ -429,3 +448,217 @@ TEST_CASE("Testing NumVal") {
     }
     
 }
+
+TEST_CASE("Testing BoolVal") {
+    
+    SECTION("constructor/print") {
+        BoolVal trueVal(true);
+        BoolVal falseVal(false);
+        ostringstream outputTrue, outputFalse;
+        
+        trueVal.print(outputTrue);
+        falseVal.print(outputFalse);
+        
+        CHECK(outputTrue.str() == "1");
+        CHECK(outputFalse.str() == "0");
+    }
+    
+    SECTION("to_expr"){
+        BoolVal boolVal(true);
+        Expr* expr = boolVal.to_expr();
+        ostringstream output;
+        expr->print(output);
+        CHECK(output.str() == "_true");
+        
+        BoolVal boolVal2(false);
+        Expr* expr2 = boolVal2.to_expr();
+        ostringstream output2;
+        expr2->print(output2);
+        CHECK(output2.str() == "_false");
+    }
+    
+    SECTION("equals") {
+        CHECK( (new BoolVal(true))->equals(new BoolVal(true))==true );
+        CHECK( (new BoolVal(true))->equals(new BoolVal(false))==false );
+    }
+    
+    SECTION("add_to") {
+            BoolVal boolVal(true);
+            BoolVal anotherBoolVal(false);
+            
+            REQUIRE_THROWS_AS(boolVal.add_to(&anotherBoolVal), runtime_error);
+    }
+    
+    SECTION("mult_with") {
+          REQUIRE_THROWS_AS((new BoolVal(true))->mult_with(new BoolVal(false)), runtime_error);
+    }
+}
+
+TEST_CASE("Testing BoolExpr") {
+    
+    SECTION("constructor + print"){
+        BoolExpr trueExpr(true);
+        BoolExpr falseExpr(false);
+        ostringstream outputTrue, outputFalse;
+                
+        trueExpr.print(outputTrue);
+        falseExpr.print(outputFalse);
+                
+        CHECK( outputTrue.str() == "_true" );
+        CHECK( outputFalse.str() == "_false" );
+    }
+    
+    SECTION("equals") {
+        CHECK( (new BoolExpr(true))->equals(new BoolExpr(true)) );
+        CHECK_FALSE( (new BoolExpr(true))->equals(new BoolExpr(false)) );
+    }
+    
+    SECTION("interp") {
+        CHECK( (new BoolExpr(true))->interp()->equals(new BoolVal(true)) );
+        CHECK( (new BoolExpr(false))->interp()->equals(new BoolVal(false)) );
+    }
+
+}
+
+TEST_CASE("Testing IfExpr") {
+    
+    SECTION("Testing constructor") {
+        Expr* condition = new BoolExpr(true);
+        Expr* thenBranch = new NumExpr(1);
+        Expr* elseBranch = new NumExpr(0);
+        IfExpr ifExpr(condition, thenBranch, elseBranch);
+
+        CHECK(ifExpr.if_ == condition);
+        CHECK(ifExpr.then_ == thenBranch);
+        CHECK(ifExpr.else_ == elseBranch);
+    }
+    
+    SECTION("Testing equals()") {
+        Expr* ifExpr1 = (new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(0)));
+        Expr* ifExpr2 = new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(0));
+        Expr* ifExpr3 = new IfExpr(new BoolExpr(false), new NumExpr(2), new NumExpr(3));
+
+        CHECK(ifExpr1->equals(ifExpr2) == true);
+        CHECK(ifExpr1->equals(ifExpr3) == false);
+    }
+    
+    SECTION("Testing interp()") {
+        Expr* conditionTrue = new BoolExpr(true);
+        Expr* conditionFalse = new BoolExpr(false);
+        Expr* thenBranch = new NumExpr(1);
+        Expr* elseBranch = new NumExpr(0);
+
+        CHECK( (new IfExpr(conditionTrue, thenBranch, elseBranch))->interp()->equals(new NumVal(1)) );
+        CHECK( (new IfExpr(conditionFalse, thenBranch, elseBranch))->interp()->equals(new NumVal(0)) );
+    }
+    
+    SECTION("Testing has_variable()") {
+        CHECK((new IfExpr(new VarExpr("x"), new NumExpr(1), new NumExpr(2)))->has_variable() == true);
+        CHECK((new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2)))->has_variable() == false);
+    }
+    
+    SECTION("Testing subst()") {
+        Expr* condition = new VarExpr("x");
+        Expr* thenBranch = new NumExpr(1);
+        Expr* elseBranch = new NumExpr(2);
+        IfExpr* ifExpr = new IfExpr(condition, thenBranch, elseBranch);
+
+        Expr* substituted = ifExpr->subst("x", new BoolExpr(true));
+
+        CHECK(dynamic_cast<IfExpr*>(substituted) != nullptr);
+        IfExpr* substIfExpr = dynamic_cast<IfExpr*>(substituted);
+        CHECK(substIfExpr->if_ != condition); // Ensure the condition has been substituted
+    }
+    
+    SECTION("Testing print()") {
+        ostringstream output;
+        IfExpr ifExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(0));
+        ifExpr.print(output);
+
+        CHECK(output.str() == "_if_true_then1_else0");
+    }
+    
+    SECTION("Testing pretty_print_at()") {
+        string expected =
+              "_if _true\n"
+              "_then 1\n"
+              "_else 0\n";
+        
+        CHECK( (new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(0)))->to_pretty_string() == expected);
+    }
+    
+    SECTION("pretty_print"){
+        
+        CHECK( (new IfExpr(new EqExpr(new VarExpr("x"), new NumExpr(1)), new NumExpr(1), new NumExpr(2)))->to_pretty_string()
+              ==
+              "_if x==1\n"
+              "_then 1\n"
+              "_else 2\n" );
+    }
+}
+
+TEST_CASE("Testing EqExpr") {
+    
+    SECTION("Testing constructor") {
+        Expr* lhs = new NumExpr(1);
+        Expr* rhs = new NumExpr(1);
+        EqExpr eqExpr(lhs, rhs);
+
+        CHECK(eqExpr.lhs == lhs);
+        CHECK(eqExpr.rhs == rhs);
+    }
+
+    SECTION("Testing equals()") {
+        Expr* eqExpr1 = new EqExpr(new NumExpr(1), new NumExpr(1));
+        Expr* eqExpr2 = new EqExpr(new NumExpr(1), new NumExpr(1));
+        Expr* eqExpr3 = new EqExpr(new NumExpr(1), new NumExpr(2));
+
+        CHECK(eqExpr1->equals(eqExpr2) == true);
+        CHECK(eqExpr1->equals(eqExpr3) == false);
+    }
+
+    SECTION("Testing interp()") {
+        Expr* lhs = new NumExpr(1);
+        Expr* rhs = new NumExpr(1);
+        Expr* eqExprTrue = new EqExpr(lhs, rhs);
+
+        Expr* rhsFalse = new NumExpr(2);
+        Expr* eqExprFalse = new EqExpr(lhs, rhsFalse);
+
+        CHECK(dynamic_cast<BoolVal*>(eqExprTrue->interp())->equals(new BoolVal(true)));
+        CHECK(dynamic_cast<BoolVal*>(eqExprFalse->interp())->equals(new BoolVal(false)));
+    }
+
+    SECTION("Testing has_variable()") {
+        CHECK((new EqExpr(new VarExpr("x"), new NumExpr(1)))->has_variable() == true);
+        CHECK((new EqExpr(new NumExpr(1), new NumExpr(2)))->has_variable() == false);
+    }
+
+    SECTION("Testing subst()") {
+        Expr* lhs = new VarExpr("x");
+        Expr* rhs = new NumExpr(1);
+        EqExpr* eqExpr = new EqExpr(lhs, rhs);
+
+        Expr* substituted = eqExpr->subst("x", new NumExpr(2));
+
+        CHECK(dynamic_cast<EqExpr*>(substituted) != nullptr);
+        EqExpr* substEqExpr = dynamic_cast<EqExpr*>(substituted);
+        CHECK(substEqExpr->lhs != lhs); // Ensure the lhs has been substituted
+    }
+
+    SECTION("Testing print()") {
+        ostringstream output;
+        EqExpr eqExpr(new NumExpr(1), new NumExpr(1));
+        eqExpr.print(output);
+
+        CHECK(output.str() == "1==1");
+    }
+
+    SECTION("Testing pretty_print_at()") {
+        string expected = "1==1";
+        CHECK( (new EqExpr(new NumExpr(1), new NumExpr(1)))->to_pretty_string() == expected);
+    }
+ 
+}
+
+

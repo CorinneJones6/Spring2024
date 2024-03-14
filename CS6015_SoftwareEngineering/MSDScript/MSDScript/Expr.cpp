@@ -424,21 +424,21 @@ void LetExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_pare
         ostream << "(";
     }
     
-    streampos startPosition = ostream.tellp(); //TODO jake changed from above
+    streampos startPosition = ostream.tellp();
     
     streampos depth = startPosition-strmpos;
     
     ostream << "_let " << lhs << " = ";
     
-    rhs->pretty_print_at(ostream, prec_none, false, strmpos); //TODO jake changed from depth
+    rhs->pretty_print_at(ostream, prec_none, false, strmpos);
     
     ostream << "\n";
     
-    strmpos = ostream.tellp();  //TODO jake changed from rc
+    strmpos = ostream.tellp();
     
     ostream << string(depth, ' ') << "_in  ";
    
-    body->pretty_print_at(ostream, prec_none, false, strmpos);  //TODO jake changed from rc
+    body->pretty_print_at(ostream, prec_none, false, strmpos);
 
     if (let_parent) {
         ostream << ")";
@@ -482,7 +482,12 @@ void BoolExpr::print(ostream &ostream){
 }
 
 void BoolExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos){
-    
+    if(val){
+        ostream << "_true";
+    }
+    else if (!val){
+        ostream << "_false";
+    }
 }
 
 //======================  IfExpr  ======================//
@@ -499,7 +504,7 @@ bool IfExpr::equals (Expr *e){
     if (ifPtr == nullptr) {
         return false;
     }
-    return this->if_ == ifPtr->if_ && this->then_ == ifPtr->then_ && this->else_ == ifPtr->else_;
+    return this->if_->equals(ifPtr->if_) && this->then_->equals(ifPtr->then_) && this->else_->equals(ifPtr->else_);
 }
 
 Val* IfExpr::interp(){
@@ -529,15 +534,37 @@ void IfExpr::print(ostream &ostream){
     this->else_->print(ostream);
 }
 
-void IfExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos){
+void IfExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos) {
+    
+    ostream << "_if ";
+    
+    if_->pretty_print_at(ostream, prec_none, false, strmpos);
+    
+    ostream << "\n";
+    
+    strmpos = ostream.tellp();
+    
+    ostream << "_then ";
+    
+    then_->pretty_print_at(ostream, prec_none, false, strmpos);
+    
+    ostream << "\n";
+    
+    ostream << "_else ";
+    
+    strmpos = ostream.tellp();
+    
+    else_->pretty_print_at(ostream, prec_none, false, strmpos);
+    
+    ostream << "\n";
     
 }
 
 //======================  EqExpr  ======================//
 
-EqExpr::EqExpr(Expr* rhs, Expr* lhs){
-    this->rhs = rhs;
+EqExpr::EqExpr(Expr* lhs, Expr* rhs){
     this->lhs = lhs;
+    this->rhs = rhs;
 }
 
 bool EqExpr::equals (Expr *e){
@@ -546,7 +573,7 @@ bool EqExpr::equals (Expr *e){
     if (eqPtr == nullptr) {
         return false;
     }
-    return this->rhs == eqPtr->rhs && this->lhs == eqPtr->lhs;
+    return this->rhs->equals(eqPtr->rhs) && this->lhs->equals(eqPtr->lhs);
 }
 
 Val* EqExpr::interp(){
@@ -569,6 +596,11 @@ void EqExpr::print(ostream &ostream){
 
 void EqExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos){
     
+    lhs->pretty_print_at(ostream, prec_none, false, strmpos);
+    
+    ostream << "==";
+    
+    rhs->pretty_print_at(ostream, prec_none, false, strmpos);
 }
 
 
