@@ -8,6 +8,7 @@
 #pragma once
 #include <stdio.h>
 #include "HashTable.hpp"
+#include <unistd.h>
 
 class MyMalloc {
 
@@ -15,6 +16,9 @@ class MyMalloc {
     
 public:
     //constructor and destructor
+    MyMalloc();
+    
+    
     MyMalloc(size_t initialCapacity) : hashTable(initialCapacity) {
         
     }

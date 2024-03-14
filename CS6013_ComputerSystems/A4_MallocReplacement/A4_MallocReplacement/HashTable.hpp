@@ -10,6 +10,9 @@
 #include <iostream>
 #include <sys/mman.h>
 #include <stdio.h>
+#include <unistd.h>
+
+using namespace std; 
 
 class HashTable {
 
@@ -17,43 +20,31 @@ class HashTable {
     struct Entry {
         
         //pointer to where the allocated memory starts
-        void* key;
+        void* address;
 
         //size of memory allocated
-        size_t size;
+        size_t memSize;
         
-        // 
+        //bool if the memory is available, used for lazy deletion
         bool isAvailable;
-        
     };
 
-    //MV that is the hash table
     Entry* table;
-
-    //capacity of the hash table
     size_t capacity;
-
-    //num of elems in the hash table
     size_t count;
 
-    //hash method to find a spot to place an entry
-    size_t hash(void* key);
-
-    //method to linearly probe the hash table
-    size_t probe(size_t hash, size_t i);
-    
-    
-
-    //method to grow the hash table when necessary
+    size_t hash(void* address);
+    size_t probe(size_t i);
     void grow();
     
 public:
-    //constructor and destructor
+    //constructors and destructor
+    HashTable();
     HashTable(size_t initialCapacity);
     ~HashTable();
 
-    size_t find(void* key);
-    //public methods to insert, remove, and find elems in the hash table
-    bool insert(void* key, size_t size);
-    bool remove(void* key);
+    size_t getSize(void* address);
+    size_t find(void* address);
+    bool insert(void* address, size_t size);
+    bool remove(void* address);
 };

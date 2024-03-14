@@ -4,38 +4,48 @@
 //
 //  Created by Corinne Jones on 3/11/24.
 //
+
 #include "HashTable.hpp"
 
-//private methods
-size_t HashTable::hash(void *key) {
+//==================== PRIVATE METHODS ====================//
+
+size_t HashTable::hash(void *address) {
     //A reasonable hash function for pointers is x >> VirtualAddressOffsetSizeInBits
-    int VirtualAddressOffsetSizeInBits = 0;
+    static const int VirtualAddressOffsetSizeInBits = std::log2(sysconf(_SC_PAGESIZE));
     
-    for(int i=1; i < sizeof(void*); i*=2){
-        VirtualAddressOffsetSizeInBits++;
+    return reinterpret_cast<size_t>(address) >> VirtualAddressOffsetSizeInBits;
+}
+
+size_t HashTable::probe(size_t i) {
+    
+    return (i+1) % capacity;
+}
+
+size_t HashTable::getSize(void* address){
+    size_t index = find(address);
+    
+    if(index==-1){
+        cerr << "Address not found." << endl;
+        return -1;
     }
     
-    return reinterpret_cast<size_t>(key) >> VirtualAddressOffsetSizeInBits;
+    return table[index].memSize;
 }
 
-size_t HashTable::probe(size_t hash, size_t i) {
+size_t HashTable::find(void *address) {
     
-    return (hash + i) / capacity;
-}
-
-size_t HashTable::find(void *key) {
-    
-    size_t i = hash(key);
+    size_t i = hash(address);
     
     i %= capacity;
     
-    int count = 0;
+    int increment = 0;
     
-    while(table[i].key != key){
+    while(table[i].address != address){
         i = (i+1) % capacity;
-        count++;
+        increment++;
         
-        if(count >= capacity){
+        if(increment > capacity){
+            cerr << "Address not found." << endl;
             return -1; //flag for index not found
         }
     }
@@ -44,54 +54,81 @@ size_t HashTable::find(void *key) {
 }
 
 void HashTable::grow() {
-    //store the old variables
+    //Store old variables
     size_t oldCapacity = capacity;
     
     Entry* oldTable = table;
     
-    // Update member variables
-    capacity = oldCapacity * 2;
+    //Update to new variables
+    capacity *=2;
+    table = (Entry*)mmap(NULL, capacity * sizeof(Entry), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    
+    if(table == MAP_FAILED){
+        throw runtime_error("Failed to allocate memory for the hashtable using mmap.");
+    }
+    
+    for (size_t i = 0; i < capacity; i++) {
+            table[i].isAvailable = true;
+    }
+    
+    // Rehash entries from old table to new one
+    for(size_t i = 0; i < oldCapacity; i++) {
+        if (!oldTable[i].isAvailable) {
+               insert(oldTable[i].address, oldTable[i].memSize);
+        }
+    }
+       
+    // Free memory from old table
+    munmap(oldTable, oldCapacity * sizeof(Entry));
+}
+
+//==================== PUBLIC METHODS ====================//
+
+//param 1: NULL - starting address of memory; let the computer decide
+//param 2: length of memory to be allocated; capacity * sizeof(Entry) gives size of one entry * how many entries I can have
+//param 3: protection flags for memory area; Need to be able to read and write from the area, combine the flags with bitwise operator |
+//param 4: mapping flags; MAP_PRIVATE because want the memory to be exclusive to this program, MAP_ANONYMOUS because the memory is not backed by a file
+//param 5 and 6: standards entries for when the memory is not backed by a file
+
+HashTable::HashTable(){
+    capacity = 10;
+    count = 0;
     
     table = (Entry*)mmap(NULL, capacity * sizeof(Entry), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    
+    if(table == MAP_FAILED){
+        throw runtime_error("Failed to allocate memory for the hashtable using mmap.");
+    }
+    
+    for(size_t i = 0; i < capacity; i++){
+        table[i].isAvailable = true;
+    }
+}
+
+HashTable::HashTable(size_t capacity) {
+    this->capacity = capacity;
+    count = 0;
+    
+    table = (Entry*)mmap(NULL, capacity * sizeof(Entry), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+    if(table == MAP_FAILED){
+        throw runtime_error("Failed to allocate memory for HashTable using mmap.");
+    }
     
     for (size_t i = 0; i < capacity; i++) {
         table[i].isAvailable = true;
     }
-    
-    // Rehash entries from old table to new one
-       for(size_t i = 0; i < capacity; i++) {
-           if (table[i].isAvailable) {
-               table[i]=oldTable[i];
-           }
-       }
-       
-       // Free old table???????
-       munmap(oldTable, oldCapacity * sizeof(Entry));
-}
-
-//public methods
-HashTable::HashTable(size_t initialCapacity) {
-    capacity = initialCapacity;
-    count = 0;
-    
-    //param 1: NULL - starting address of memory; I don't care where so I'll let the computer decide
-    //param 2: length of memory to be allocated; capacity * sizeof(Entry) gives me the size of one entry * how many entries I can have
-    //param 3: protection flags for memory area; I want to be able to read and write from the area, combine the flags with bitwise operator |
-    //param 4: mapping flags; MAP_PRIVATE because I want the memory to be exclusive to this program, MAP_ANONYMOUS because the memory is not backed by a file
-    //param 5 and 6: standards entries for when the memory is not backed by a file
-    table = (Entry*)mmap(NULL, capacity * sizeof(Entry), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    
-    //initialize the table with empty values/not occupied
-       for (size_t i = 0; i < capacity; i++) {
-           table[i].isAvailable = true;
-       }
 }
 
 HashTable::~HashTable() {
-    munmap(table, capacity * sizeof(Entry));
+    int rc = munmap(table, capacity * sizeof(Entry));
+    
+    if(rc==-1){
+        cerr << "Hashtable munmap() failed." << endl;
+    }
 }
 
-bool HashTable::insert(void *key, size_t size) {
+bool HashTable::insert(void *address, size_t size) {
     
     size_t oldCount = count;
 
@@ -100,42 +137,51 @@ bool HashTable::insert(void *key, size_t size) {
     }
     
     //Get the index and put it within the capacity
-    size_t i = hash(key);
+    size_t i = hash(address);
     
     i = i % capacity;
     
     while(!table[i].isAvailable){
         //handle if the key exists
-        if(table[i].key == key) {
+        if(table[i].address == address) {
             return false;
         }
-        i = (i+1) % capacity;
+        i = probe(i); //linear probing
     }
     
     // if available, assigns new values
-    table[i].key=key;
-    table[i].size=size;
+    table[i].address=address;
+    table[i].memSize=size;
     table[i].isAvailable = false;
     count++;
     
     return count > oldCount;
 }
 
-bool HashTable::remove(void *key) {
+bool HashTable::remove(void *address) {
     
     size_t oldCount = count;
     
-    size_t i = hash(key);
+    size_t i = hash(address);
     
     i = i % capacity;
     
+    int increment = 0;
+    
     while(!table[i].isAvailable){
-        if(table[i].key==key){
+        if(table[i].address==address){
             table[i].isAvailable = true;
             count--;
             break;
         }
-        i = (i+1) % capacity;
+        
+        i = probe(i); //linear probing
+        
+        increment++;
+        
+        if(increment > capacity){
+            break;
+        }
     }
     
     return count < oldCount;
