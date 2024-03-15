@@ -1,19 +1,12 @@
-//
-//  MyMalloc.cpp
-//  A4_MallocReplacement
-//
-//  Created by Corinne Jones on 3/11/24.
-//
+/**
+ * @file MyMalloc.cpp
+ * @brief Assignment 4: Malloc Replacement - Implementation of the MyMalloc class for custom memory allocation.
+ *
+ * Created by Corinne Jones on 3/11/24.
+ */
 
 #include "MyMalloc.hpp"
 
-MyMalloc::MyMalloc(){
-    hashTable = HashTable();
-}
-
-MyMalloc::~MyMalloc(){
-
-}
 
 void* MyMalloc::allocate( size_t bytesToAllocate ){
     size_t pageSize = getpagesize();
@@ -55,5 +48,4 @@ void MyMalloc::deallocate( void* ptr ){
     if(!didRemove){
         cerr << "MyMalloc::deallocate() did not remove the ptr" << endl;
     }
-    
 }

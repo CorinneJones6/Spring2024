@@ -2,9 +2,9 @@
 CXX = c++
 CFLAGS = --std=c++11
 LINKER = -o
-CXXSOURCE = HashTable.cpp Tests.cpp
-HEADERS = HashTable.hpp
-OBJFILES = HashTable.o Tests.o
+CXXSOURCE = MyMalloc.cpp HashTable.cpp Tests.cpp
+HEADERS = MyMalloc.hpp HashTable.hpp
+OBJFILES = MyMalloc.o HashTable.o Tests.o
 
 all: executable
 

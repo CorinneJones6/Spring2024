@@ -1,17 +1,16 @@
-//
-//  HashTable.cpp
-//  A4_MallocReplacement
-//
-//  Created by Corinne Jones on 3/11/24.
-//
-
+/**
+ * @file HashTable.hpp
+ * @brief Assignment 4: Malloc Replacement - Defines a HashTable class for managing memory allocations.
+ *
+ * Created by Corinne Jones on 3/11/24.
+ */
 #include "HashTable.hpp"
 
 //==================== PRIVATE METHODS ====================//
 
 size_t HashTable::hash(void *address) {
     //A reasonable hash function for pointers is x >> VirtualAddressOffsetSizeInBits
-    static const int VirtualAddressOffsetSizeInBits = std::log2(sysconf(_SC_PAGESIZE));
+    const int VirtualAddressOffsetSizeInBits = 14;
     
     return reinterpret_cast<size_t>(address) >> VirtualAddressOffsetSizeInBits;
 }
@@ -19,6 +18,14 @@ size_t HashTable::hash(void *address) {
 size_t HashTable::probe(size_t i) {
     
     return (i+1) % capacity;
+}
+
+size_t HashTable::getCapacity(){
+    return capacity;
+}
+
+size_t HashTable::getCount(){
+    return count;
 }
 
 size_t HashTable::getSize(void* address){
@@ -71,6 +78,7 @@ void HashTable::grow() {
             table[i].isAvailable = true;
     }
     
+    count = 0;
     // Rehash entries from old table to new one
     for(size_t i = 0; i < oldCapacity; i++) {
         if (!oldTable[i].isAvailable) {
@@ -83,12 +91,6 @@ void HashTable::grow() {
 }
 
 //==================== PUBLIC METHODS ====================//
-
-//param 1: NULL - starting address of memory; let the computer decide
-//param 2: length of memory to be allocated; capacity * sizeof(Entry) gives size of one entry * how many entries I can have
-//param 3: protection flags for memory area; Need to be able to read and write from the area, combine the flags with bitwise operator |
-//param 4: mapping flags; MAP_PRIVATE because want the memory to be exclusive to this program, MAP_ANONYMOUS because the memory is not backed by a file
-//param 5 and 6: standards entries for when the memory is not backed by a file
 
 HashTable::HashTable(){
     capacity = 10;
@@ -132,7 +134,7 @@ bool HashTable::insert(void *address, size_t size) {
     
     size_t oldCount = count;
 
-    if(count/capacity > .7){
+    if((count/capacity) > .7){
         grow();
     }
     
@@ -141,18 +143,27 @@ bool HashTable::insert(void *address, size_t size) {
     
     i = i % capacity;
     
+    int loopProtection = 0;
+    
     while(!table[i].isAvailable){
         //handle if the key exists
         if(table[i].address == address) {
             return false;
         }
-        i = probe(i); //linear probing
+        i = probe(i);
+        
+        // used in debugging
+        if(++loopProtection > capacity) {
+            cerr << "Error: Stuck in insert loop." << endl;
+            break;
+        }
     }
     
     // if available, assigns new values
     table[i].address=address;
     table[i].memSize=size;
     table[i].isAvailable = false;
+    
     count++;
     
     return count > oldCount;
@@ -166,20 +177,19 @@ bool HashTable::remove(void *address) {
     
     i = i % capacity;
     
-    int increment = 0;
+    int loopProtection = 0;
     
-    while(!table[i].isAvailable){
+    while(true){
         if(table[i].address==address){
             table[i].isAvailable = true;
             count--;
             break;
         }
         
-        i = probe(i); //linear probing
+        i = probe(i); 
         
-        increment++;
-        
-        if(increment > capacity){
+        if(++loopProtection > capacity){
+            cerr << "Error: Stuck in remove loop." << endl;
             break;
         }
     }
