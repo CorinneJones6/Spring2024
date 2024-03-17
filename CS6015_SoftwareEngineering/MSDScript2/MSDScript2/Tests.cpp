@@ -709,12 +709,13 @@ TEST_CASE("Testing EqExpr") {
         CHECK( (new EqExpr(new NumExpr(1), new NumExpr(1)))->to_pretty_string() == expected);
     }
     
-    SECTION("HW9 Assignment Example") {
+    SECTION("Testing embedded let/if statement") {
         //_let same = 1 == 2
         //_in  _if 1 == 2
         //     _then _false + 5
         //     _else 88
 
+        //should not throw an exception, should evaluate to 88
         Expr* equals = new EqExpr(new NumExpr(1), new NumExpr(2));
 
         Expr* ifExpr = new IfExpr(new EqExpr(new NumExpr(1), new NumExpr(2)), new AddExpr(new BoolExpr(false), new NumExpr(5)), new NumExpr(88));
