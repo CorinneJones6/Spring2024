@@ -389,7 +389,38 @@ TEST_CASE("parse") {
     
   CHECK( parse_str("_let x = 2 _in _let y = x + 3 _in y * x") ->equals(new LetExpr("x", new NumExpr(2),
         new LetExpr("y", new AddExpr(new VarExpr("x"), new NumExpr(3)), new MultExpr(new VarExpr("y"), new VarExpr("x"))))) );
+    
+    SECTION("Parsing BoolExpr") {
+        CHECK(parse_str(("_true"))->equals(new BoolExpr(true)));
+        CHECK(parse_str(("_false"))->equals(new BoolExpr(false)));
+    }
 
+    SECTION("Parsing IfExpr") {
+        CHECK(parse_str(("_if _true _then 1 _else 2"))->equals(
+                new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2))));
+        CHECK(parse_str(("_if _false _then 1 _else 2"))->equals(
+                new IfExpr(new BoolExpr(false), new NumExpr(1), new NumExpr(2))));
+        CHECK(parse_str(("_if 1 == 2 _then 1 _else 2"))->equals(
+                new IfExpr(new EqExpr(new NumExpr(1), new NumExpr(2)), new NumExpr(1), new NumExpr(2))));
+    }
+    SECTION("Parsing EqExpr") {
+        CHECK( parse_str("1 == 2")->interp()->equals(new BoolVal(false)) );
+        CHECK((((parse_str("_if 1 == 2 _then 5 _else 6"))->interp())->to_string()) == "6");
+        CHECK((parse_str("1 + 2 == 3 + 0"))->interp()->to_string() == "1");
+
+    }
+    
+    SECTION("Parse LetExpr") {
+        CHECK(parse_str(("_let x=5 _in (x+7)"))->equals(new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(7)))));
+        
+        CHECK(parse_str(("_let x=5 _in (x+7)"))->equals(new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(7)))));
+        
+        CHECK(parse_str(("_let x=10 _in (y+10)"))->equals(new LetExpr("x", new NumExpr(10), new AddExpr(new VarExpr("y"), new NumExpr(10)))));
+        
+        CHECK(parse_str(("(_let x=5 _in ((_let y=3 _in (y+2))+x))"))->equals(new LetExpr("x", new NumExpr(5), new AddExpr(new LetExpr("y", new NumExpr(3), new AddExpr(new VarExpr("y"), new NumExpr(2))), new VarExpr("x")))));
+        
+        CHECK(parse_str(("(_let x=5 _in (x+7))"))->equals((new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(7))))));
+    }
 }
 
 TEST_CASE("Testing NumVal") {
@@ -402,6 +433,12 @@ TEST_CASE("Testing NumVal") {
     SECTION("equals"){
         CHECK( (new NumVal(1))->equals(new NumVal(1))==true );
         CHECK( (new NumVal(1))->equals(new NumVal(2))==false );
+        
+        //(1 + 2) evaluated to 3
+        CHECK( (new AddExpr(new NumExpr(1), new NumExpr(2)))->interp()->equals(new NumVal(3)) );
+        
+        //_let x = 2+3 _in x*x evaluated to 25
+        CHECK( (new LetExpr("x", new AddExpr(new NumExpr(2), new NumExpr(3)), new MultExpr(new VarExpr("x"), new VarExpr("x"))))->interp()->equals(new NumVal(25)) );
     }
     
     SECTION("add_to"){
@@ -544,10 +581,13 @@ TEST_CASE("Testing IfExpr") {
         Expr* conditionTrue = new BoolExpr(true);
         Expr* conditionFalse = new BoolExpr(false);
         Expr* thenBranch = new NumExpr(1);
-        Expr* elseBranch = new NumExpr(0);
+        Expr* elseBranch = new NumExpr(2);
 
         CHECK( (new IfExpr(conditionTrue, thenBranch, elseBranch))->interp()->equals(new NumVal(1)) );
-//        CHECK( (new IfExpr(conditionFalse, thenBranch, elseBranch))->interp()->equals(new NumVal(0)) );
+        CHECK( (new IfExpr(conditionFalse, thenBranch, elseBranch))->interp()->equals(new NumVal(2)) );
+        
+        //_if _true _then 1 _else 2 evaluated to 1
+        CHECK( (new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2)))->interp()->equals(new NumVal(1)) );
     }
     
     SECTION("Testing has_variable()") {
@@ -625,6 +665,18 @@ TEST_CASE("Testing EqExpr") {
         
         CHECK(dynamic_cast<BoolVal*>(eqExprTrue->interp())->equals(new BoolVal(true)));
         CHECK(dynamic_cast<BoolVal*>(eqExprFalse->interp())->equals(new BoolVal(false)));
+        
+        //(1 == 2) + 3 throws an exception
+        Expr* testExpr = new AddExpr(new EqExpr(new NumExpr(1), new NumExpr(2)), new NumExpr(3));
+        CHECK_THROWS_WITH(testExpr->interp(), "Bool cannot be added");
+        
+        //1 == 2 + 3 evaluates to _false"
+        Expr* testExpr2 = new EqExpr(new NumExpr(1), new AddExpr(new NumExpr(2), new NumExpr(3)));
+        CHECK((testExpr2->interp())->to_string() == "0");
+        
+        //"1 + 1 == 2 + 0 evaluates to _true"
+        Expr* testExpr3 = new EqExpr(new AddExpr(new NumExpr(1), new NumExpr(1)), new AddExpr(new NumExpr(2), new NumExpr(0)));
+        CHECK((testExpr3->interp())->to_string() == "1");
     }
     
     SECTION("Testing has_variable()") {
@@ -663,147 +715,14 @@ TEST_CASE("Testing EqExpr") {
         //     _then _false + 5
         //     _else 88
 
-        // Constructing the inner equality expression 1 == 2
-        Expr* equality = new EqExpr(new NumExpr(1), new NumExpr(2));
+        Expr* equals = new EqExpr(new NumExpr(1), new NumExpr(2));
 
-        // Constructing the if-expression part
-        Expr* ifExpr = new IfExpr(
-                new EqExpr(new NumExpr(1), new NumExpr(2)), // condition: 1 == 2
-                new AddExpr(new BoolExpr(false), new NumExpr(5)), // then: _false + 5 (This is expected not to be evaluated)
-                new NumExpr(88) // else: 88
-        );
+        Expr* ifExpr = new IfExpr(new EqExpr(new NumExpr(1), new NumExpr(2)), new AddExpr(new BoolExpr(false), new NumExpr(5)), new NumExpr(88));
 
-        // Constructing the let-expression
-        Expr* letExpr = new LetExpr(
-                "same", // variable name
-                equality, // binding expression: 1 == 2
-                ifExpr // body of the let-expression
-        );
+        Expr* letExpr = new LetExpr("same", equals, ifExpr);
 
-        // Interpreting the let-expression
-        Val* result = letExpr->interp();
-
-        // Convert the result to a NumVal to extract its value
-        NumVal* numResult = dynamic_cast<NumVal*>(result);
-
-        CHECK(numResult->to_string() == "88"); // Verify the result is 88
+        CHECK(letExpr->interp()->to_string() == "88");
     }
 }
-
-
-TEST_CASE("HW8: Refactor interp + Val class") {
-
-    SECTION("testing_let_parse") {
-        CHECK(parse_str(("_let x=5 _in (x+7)"))->equals(
-                new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(7)))));
-
-        CHECK(parse_str(("_let x=5 _in (x+7)"))->equals(
-                new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(7)))));
-        CHECK(parse_str(("_let x=10 _in (y+10)"))->equals(
-                new LetExpr("x", new NumExpr(10), new AddExpr(new VarExpr("y"), new NumExpr(10)))));
-        CHECK(parse_str(("(_let x=5 _in ((_let y=3 _in (y+2))+x))"))
-                      ->equals(new LetExpr("x", new NumExpr(5),
-                                        new AddExpr(new LetExpr("y", new NumExpr(3), new AddExpr(new VarExpr("y"), new NumExpr(2))),
-                                                new VarExpr("x")))));
-        CHECK(parse_str(("(_let x=5 _in (x+7))"))->equals(
-                (new LetExpr("x", new NumExpr(5), new AddExpr(new VarExpr("x"), new NumExpr(7))))));
-    }
-
-    SECTION("Num interprets to NumVal", "[NumVal]") {
-        Expr *num = new NumExpr(5);
-        Val *expected = new NumVal(5);
-        REQUIRE(num->interp()->equals(expected));
-    }
-
-    SECTION("Add interprets correctly", "[Add]") {
-        Expr *num1 = new NumExpr(5);
-        Expr *num2 = new NumExpr(3);
-        Expr *addExpr = new AddExpr(num1, num2);
-        Val *expected = new NumVal(8);
-        REQUIRE(addExpr->interp()->equals(expected));
-    }
-    SECTION("Mult interprets correctly", "[Mult]") {
-        Expr *num1 = new NumExpr(4);
-        Expr *num2 = new NumExpr(2);
-        Expr *multExpr = new MultExpr(num1, num2);
-        Val *expected = new NumVal(8);
-        REQUIRE(multExpr->interp()->equals(expected));
-    }
-    SECTION("VarExpr throws exception on interp", "[VarExpr]") {
-        Expr *varExpr = new VarExpr("x");
-        REQUIRE_THROWS_AS(varExpr->interp(), std::runtime_error);
-    }
-    SECTION("NumVal equals works correctly", "[NumVal]") {
-        Val *val1 = new NumVal(10);
-        Val *val2 = new NumVal(10);
-        Val *val3 = new NumVal(5);
-        REQUIRE(val1->equals(val2));
-        REQUIRE_FALSE(val1->equals(val3));
-    }
-}
-
-TEST_CASE("HW9 Conditionals"){
-    SECTION("(1 + 2) evaluated to 3", "[NumVal]") {
-        //1 + 2 -> 3
-        CHECK( (new AddExpr(new NumExpr(1), new NumExpr(2)))->interp()->equals(new NumVal(3)) );
-    }
-    SECTION("_let x = 2+3 _in x*x evaluated to 25", "[NumVal] and [_let]"){
-        //_let x = 2+3
-        //_in x*x
-        CHECK( (new LetExpr("x",
-                            new AddExpr(new NumExpr(2), new NumExpr(3)),
-                            new MultExpr(new VarExpr("x"), new VarExpr("x"))))
-                       ->interp()
-                       ->equals(new NumVal(25)) );
-    }
-    SECTION("_if _true _then 1 _else 2 evaluated to 1", "[IfExpr] and [BoolExpr]"){
-        //_if _true
-        //_then 1
-        //_else 2
-        CHECK( (new IfExpr(new BoolExpr(true),
-                           new NumExpr(1),
-                           new NumExpr(2)))->interp()
-                       ->equals(new NumVal(1)) );
-    }
-    SECTION("(1 == 2) + 3 throws an exception", "[Add]") {
-        Expr* testExpr = new AddExpr(new EqExpr(new NumExpr(1), new NumExpr(2)), new NumExpr(3));
-        CHECK_THROWS_WITH(testExpr->interp(), "Bool cannot be added");
-    }
-
-    SECTION("1 == 2 + 3 evaluates to _false", "[EqExpr]") {
-        Expr* testExpr = new EqExpr(new NumExpr(1), new AddExpr(new NumExpr(2), new NumExpr(3)));
-        Val* result = testExpr->interp();
-        CHECK((result)->to_string() == "1");
-
-    }
-
-    SECTION("1 + 1 == 2 + 0 evaluates to _true", "[EqExpr]") {
-        Expr* testExpr = new EqExpr(new AddExpr(new NumExpr(1), new NumExpr(1)), new AddExpr(new NumExpr(2), new NumExpr(0)));
-        Val* result = testExpr->interp();
-        CHECK((result)->to_string() == "1");
-    }
-}
-
-//TEST_CASE("HW9-Parsing") {
-//    SECTION("Parsing BoolExpr") {
-//        CHECK(parse_str(("_true"))->equals(new BoolExpr(true)));
-//        CHECK(parse_str(("_false"))->equals(new BoolExpr(false)));
-//    }
-//
-//    SECTION("Parsing _if") {
-//        CHECK(parse_str(("_if _true _then 1 _else 2"))->equals(
-//                new IfExpr(new BoolExpr(true), new Num(1), new Num(2))));
-//        CHECK(parse_str(("_if _false _then 1 _else 2"))->equals(
-//                new IfExpr(new BoolExpr(false), new Num(1), new Num(2))));
-//        CHECK(parse_str(("_if 1 == 2 _then 1 _else 2"))->equals(
-//                new IfExpr(new EqExpr(new Num(1), new Num(2)), new Num(1), new Num(2))));
-//    }
-//    SECTION("Equality parsing") {
-//        CHECK( parse_str("1 == 2")->interp()->equals(new BoolVal(false)) );
-//        CHECK((((parse_str("_if 1 == 2 _then 5 _else 6"))->interp())->to_string()) == "6");
-//        CHECK((parse_str("1 + 2 == 3 + 0"))->interp()->to_string() == "_true");
-//
-//    }
-//}
 
 

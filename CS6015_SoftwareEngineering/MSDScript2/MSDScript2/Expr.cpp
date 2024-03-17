@@ -509,7 +509,7 @@ bool IfExpr::equals (Expr *e){
 }
 
 Val* IfExpr::interp(){
-    if(if_->interp()){
+    if(if_->interp()->is_true()){
         return then_->interp();
     }
     else {
