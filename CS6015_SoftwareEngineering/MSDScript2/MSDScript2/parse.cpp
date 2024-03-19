@@ -102,13 +102,24 @@ static string parse_term(istream &in){
     return term;
 }
 
+Expr* parse_multicand(istream &in){
+    Expr *expr = parse_inner(in);
+    while(in.peek() == '('){
+        consume(in, '(');
+        Expr* actual_arg = parse_expr(in);
+        consume(in, ')');
+        expr = new CallExpr(expr, actual_arg);
+    }
+    return expr;
+}
+
 /**
  * Parses expressions with multiplication and division candidates from an input stream.
  *
  * \param in Reference to input stream from which the expression is read.
  * \return Pointer to the parsed expression object.
  */
-Expr* parse_multicand(istream &in) {
+Expr* parse_inner(istream &in) {
     skip_whitespace(in);
     int c = in.peek();
     
@@ -139,14 +150,17 @@ Expr* parse_multicand(istream &in) {
         if(term == "let"){
             return parse_let(in);
         }
-        else if(term == "if"){
-            return parse_if(in);
-        }
         else if(term == "true"){
             return new BoolExpr(true);
         }
         else if(term == "false"){
             return new BoolExpr(false);
+        }
+        else if(term == "if"){
+            return parse_if(in);
+        }
+        else if(term == "fun"){
+            return parse_fun(in);
         }
         else{
             throw runtime_error("invalid input");
@@ -333,5 +347,24 @@ Expr* parse_if(istream &in){
     
     return new IfExpr(ifStatement, thenStatement, elseStatment);
 }
+
+Expr* parse_fun(istream &in){
+    skip_whitespace(in);
+    
+    consume(in, '(');
+    
+    Expr *e = parse_var(in);
+    
+    string var = e->to_string();
+    
+    consume(in, ')');
+    
+    skip_whitespace(in);
+    
+    e = parse_expr(in);
+    
+    return new FunExpr(var, e);
+}
+
 
 

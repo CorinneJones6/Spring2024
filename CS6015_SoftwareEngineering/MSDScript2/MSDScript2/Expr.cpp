@@ -87,9 +87,9 @@ Val* AddExpr:: interp(){
  * \brief Checks if the expression contains a variable.
  * \return True if a variable is present, false otherwise.
  */
-bool AddExpr::has_variable(){
-    return this->lhs->has_variable()||this->rhs->has_variable();
-}
+//bool AddExpr::has_variable(){
+//    return this->lhs->has_variable()||this->rhs->has_variable();
+//}
 
 /**
  * \brief Substitutes a variable in the expression with another expression.
@@ -170,9 +170,9 @@ Val* MultExpr:: interp() {
  * \brief Determines if the expression contains a variable.
  * \return True if a variable is present, false otherwise.
  */
-bool MultExpr::has_variable() {
-    return this->lhs->has_variable()||this->rhs->has_variable();
-}
+//bool MultExpr::has_variable() {
+//    return this->lhs->has_variable()||this->rhs->has_variable();
+//}
 
 /**
  * \brief Substitutes a variable within the expression.
@@ -253,9 +253,9 @@ Val* NumExpr:: interp(){
  * \brief Checks if the numeric constant contains a variable.
  * \return False, as numeric constants do not contain variables.
  */
-bool NumExpr::has_variable() {
-    return false;
-}
+//bool NumExpr::has_variable() {
+//    return false;
+//}
 
 /**
  * \brief Substitutes a variable within this numeric expression. Since `Num` does not contain variables, it returns itself.
@@ -304,17 +304,16 @@ bool VarExpr::equals (Expr *e) {
  */
 Val* VarExpr::interp(){
     throw runtime_error("Var cannot be converted to a number");
-    
-    return new NumVal(-1);
+//    return new NumVal(-1);
 }
 
 /**
  * \brief Checks if the expression contains a variable.
  * \return True, as this object represents a variable.
  */
-bool VarExpr::has_variable() {
-    return true;
-}
+//bool VarExpr::has_variable() {
+//    return true;
+//}
 
 /**
  * \brief Substitutes the variable with another expression if it matches the variable name.
@@ -359,12 +358,12 @@ LetExpr::LetExpr(string lhs, Expr* rhs, Expr* body){
  * \return True if both expressions are Let expressions with equal lhs, rhs, and body; otherwise false.
  */
 bool LetExpr::equals(Expr* e){
- LetExpr* _letPtr = dynamic_cast<LetExpr*>(e);
+    LetExpr* _letPtr = dynamic_cast<LetExpr*>(e);
     
- if(_letPtr==nullptr){
+    if(_letPtr==nullptr){
         return false;
- }
- return this->lhs==(_letPtr->lhs) && this->rhs->equals(_letPtr->rhs) && this->body->equals(_letPtr->body);
+    }
+    return this->lhs==(_letPtr->lhs) && this->rhs->equals(_letPtr->rhs) && this->body->equals(_letPtr->body);
 }
 
 /**
@@ -376,14 +375,6 @@ Val* LetExpr::interp(){
     Val* rhsValue = rhs->interp();
     
     return body->subst(lhs, rhsValue->to_expr())->interp();
-}
-
-/**
- * \brief Determines if the Let expression contains a variable.
- * \return True if either rhs or body contains a variable; otherwise false.
- */
-bool LetExpr::has_variable(){
-    return this->rhs->has_variable()||this->body->has_variable();
 }
 
 /**
@@ -464,10 +455,6 @@ Val* BoolExpr::interp(){
     return new BoolVal(val);
 }
 
-bool BoolExpr::has_variable(){
-    return false;
-}
-
 Expr* BoolExpr::subst(string str, Expr* e){
     return this;
 }
@@ -515,10 +502,6 @@ Val* IfExpr::interp(){
     else {
         return else_->interp();
     }
-}
-
-bool IfExpr::has_variable(){
-    return this->if_->has_variable()||this->then_->has_variable()||else_->has_variable();
 }
 
 Expr* IfExpr::subst(string str, Expr* e){
@@ -589,10 +572,6 @@ Val* EqExpr::interp(){
    return new BoolVal(rhs->interp()->equals(lhs->interp()));
 }
 
-bool EqExpr::has_variable(){
-    return this->rhs->has_variable()||this->lhs->has_variable();
-}
-
 Expr* EqExpr::subst(string str, Expr* e){
     return new EqExpr(this->rhs->subst(str, e), this->lhs->subst(str, e));
 }
@@ -622,5 +601,72 @@ void EqExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_paren
     }
 }
 
+//======================  FunExpr  ======================//
 
+FunExpr::FunExpr(string formal_arg, Expr *body){
+    this->formal_arg = formal_arg;
+    this->body = body;
+}
 
+bool FunExpr::equals (Expr *e){
+    FunExpr* funPtr = dynamic_cast<FunExpr*>(e);
+    
+    if (funPtr == nullptr) {
+        return false;
+    }
+    return this->formal_arg == funPtr->formal_arg && this->body->equals(funPtr->body);
+}
+
+Val* FunExpr::interp(){
+    return new FunVal(formal_arg, body); 
+}
+
+Expr* FunExpr::subst(string str, Expr* e){
+    
+    if(formal_arg == str){
+        return new FunExpr(formal_arg, body->subst(str, e));
+    }
+    else{
+        return this;
+    }
+}
+
+void FunExpr::print(ostream &ostream){
+    ostream << "_fun (" << this->formal_arg << ") " << this->body->to_string();
+}
+
+void FunExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos){
+    
+}
+
+//======================  CallExpr  ======================//
+
+CallExpr::CallExpr(Expr *to_be_called, Expr *actual_arg){
+    this->to_be_called = to_be_called;
+    this->actual_arg = actual_arg; 
+}
+
+bool CallExpr::equals (Expr *e){
+    CallExpr* callPtr = dynamic_cast<CallExpr*>(e);
+    
+    if (callPtr == nullptr) {
+        return false;
+    }
+    return this->to_be_called->equals(callPtr->to_be_called) && this->actual_arg->equals(callPtr->actual_arg);
+}
+
+Val* CallExpr::interp(){
+    return to_be_called->interp()->call(actual_arg->interp());
+}
+
+Expr* CallExpr::subst(string str, Expr* e){
+    return new CallExpr(this->to_be_called->subst(str, e), this->actual_arg->subst(str, e));
+}
+
+void CallExpr::print(ostream &ostream){
+    ostream << "(" << this->to_be_called->to_string() << ") (" << this->actual_arg->to_string() << ")";
+}
+
+void CallExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos){
+    
+}

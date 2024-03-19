@@ -13,8 +13,6 @@
 #include <cstdlib>
 
 int main(int argc, char **argv) {
-    
-    parse_str("1 == 2")->interp()->equals(new BoolVal(false));
 
     try{
         run_mode_t type = use_arguments(argc, argv);
@@ -25,7 +23,7 @@ int main(int argc, char **argv) {
             case do_interp: {
                 Expr *e = parse(cin);
                 Val* i = e->interp();
-                cout << i << "\n";
+                cout << i->to_string() << "\n";
                 break;
             }
             case do_print: {

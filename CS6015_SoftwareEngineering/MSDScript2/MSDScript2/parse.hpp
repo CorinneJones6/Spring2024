@@ -18,6 +18,8 @@ static string parse_term(istream &in);
 
 Expr *parse_multicand(istream &in);
 
+Expr* parse_inner(istream &in);
+
 Expr *parse_num(istream &in);
 
 static void consume(istream &in, int expect);
@@ -32,6 +34,8 @@ static void consume_word(istream &in, string str);
 
 Expr *parse_let(istream &in);
 
-Expr* parse_if(istream &in); 
+Expr* parse_if(istream &in);
+
+Expr* parse_fun(istream &in); 
 
 

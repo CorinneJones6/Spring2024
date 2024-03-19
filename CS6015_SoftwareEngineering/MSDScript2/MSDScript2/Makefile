@@ -1,6 +1,6 @@
 # Define variables
 CXX = c++
-CFLAGS = --std=c++11
+CFLAGS = --std=c++11 -fsanitize=undefined -fno-sanitize-recover=undefined
 LINKER = -o
 CXXSOURCE = cmdline.cpp Expr.cpp main.cpp Tests.cpp parse.cpp Val.cpp
 HEADERS = cmdline.hpp Expr.hpp catch.h parse.hpp Val.hpp

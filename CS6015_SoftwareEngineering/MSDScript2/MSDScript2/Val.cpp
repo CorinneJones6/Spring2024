@@ -15,8 +15,8 @@ string Val::to_string(){
     return st.str();
 }
 
-NumVal::NumVal(int i){
-    val = i;
+NumVal::NumVal(int val){
+    this->val = val;
 }
 
 Expr* NumVal::to_expr(){
@@ -35,13 +35,13 @@ bool NumVal::equals (Val *v){
 Val* NumVal::add_to(Val* other_val){
     NumVal *other_num = dynamic_cast<NumVal*>(other_val);
     if(other_num == NULL) throw runtime_error("add of a non-number");
-    return new NumVal(this->val + other_num->val);
+    return new NumVal((unsigned)this->val + (unsigned)other_num->val);
 }
 
 Val* NumVal::mult_with(Val* other_val){
     NumVal *other_num = dynamic_cast<NumVal*>(other_val);
     if(other_num == NULL) throw runtime_error("mult of a non-number");
-    return new NumVal(this->val * other_num->val);
+    return new NumVal((unsigned)this->val * (unsigned)other_num->val);
 }
 
 void NumVal::print (ostream &ostream){
@@ -50,7 +50,10 @@ void NumVal::print (ostream &ostream){
 
 bool NumVal::is_true() {
     throw runtime_error("number cannot be boolean");
-    return false;
+}
+
+Val* NumVal::call(Val* actual_arg){
+    throw runtime_error("NumVal does not call()");
 }
 
 //======================  BoolVal  ======================//
@@ -74,20 +77,69 @@ bool BoolVal::equals (Val *v){
 
 Val* BoolVal::add_to(Val* other_val){
     throw runtime_error("Bool cannot be added");
-    
-//    return new NumVal(-1);
 }
 
 Val* BoolVal::mult_with(Val* other_val){
     throw runtime_error("Bool cannot be multiplied");
-    
-//    return new NumVal(-1);
 }
 
 void BoolVal::print(ostream &ostream){
-    ostream<<::to_string(val);
+    if(val){
+        ostream << "_true";
+    }
+    else if (!val){
+        ostream << "_false";
+    }
 }
 
 bool BoolVal::is_true() {
     return val;
+}
+
+Val* BoolVal::call(Val* actual_arg){
+    throw runtime_error("BoolVal does not call()");
+}
+
+//======================  FunVal  ======================//
+
+FunVal::FunVal(string formal_arg, Expr *body){
+    this->formal_arg = formal_arg;
+    this->body = body; 
+}
+
+Expr* FunVal::to_expr(){
+    return new FunExpr(this->formal_arg, this->body);
+}
+
+bool FunVal::equals (Val *v){
+    FunVal* funPtr = dynamic_cast<FunVal*>(v);
+    
+    if (funPtr == nullptr){
+        return false;
+    }
+    return this->formal_arg == funPtr->formal_arg && this->body->equals(funPtr->body);
+}
+
+Val* FunVal::add_to(Val* other_val){
+    throw runtime_error("Function cannot be added");
+}
+
+Val* FunVal::mult_with(Val* other_val){
+    throw runtime_error("Function cannot be multiplied");
+}
+
+void FunVal::print(ostream &ostream){
+    ostream << "_fun (" << this->formal_arg << ") " << this->body->to_string();
+}
+
+bool FunVal::is_true(){
+    throw runtime_error("function cannot be boolean");
+}
+
+Val* FunVal::call(Val* actual_arg){
+    
+    Expr* actualExpr = actual_arg->to_expr();
+    
+    return body->subst(formal_arg, actualExpr)->interp();
+    
 }
