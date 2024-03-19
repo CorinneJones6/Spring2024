@@ -426,6 +426,7 @@ TEST_CASE("parse") {
     SECTION("Parsing FunExpr"){
         CHECK((parse_str("_let f = _fun (x) x+1"
                          "_in f(10)"))->interp()->to_string() == "11");
+        
         CHECK((parse_str("_let f = _fun (x) x*x"
                          "_in f(2)"))->interp()->to_string() == "4");
         

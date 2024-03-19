@@ -82,9 +82,9 @@ Expr* parse_addend(istream &in) {
         Expr *rhs = parse_addend(in);
         return new MultExpr(e, rhs);
     }
-    else{
-        return e ;
-    }
+    
+    return e ;
+
 }
 
 static string parse_term(istream &in){
@@ -104,11 +104,12 @@ static string parse_term(istream &in){
 
 Expr* parse_multicand(istream &in){
     Expr *expr = parse_inner(in);
+
     while(in.peek() == '('){
         consume(in, '(');
         Expr* actual_arg = parse_expr(in);
         consume(in, ')');
-        expr = new CallExpr(expr, actual_arg);
+        return new CallExpr(expr, actual_arg);
     }
     return expr;
 }
@@ -129,7 +130,7 @@ Expr* parse_inner(istream &in) {
     
     else if (c == '(') {
         consume(in, '(');
-        Expr *e = parse_comparg(in);
+        Expr *e = parse_expr(in);
         skip_whitespace(in);
         c = in.get();
         if (c != ')'){

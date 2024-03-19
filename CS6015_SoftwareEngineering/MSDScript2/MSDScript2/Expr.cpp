@@ -622,12 +622,13 @@ Val* FunExpr::interp(){
 }
 
 Expr* FunExpr::subst(string str, Expr* e){
-    
     if(formal_arg == str){
-        return new FunExpr(formal_arg, body->subst(str, e));
+        // Return the function as is, no substitution needed
+        return this;
     }
     else{
-        return this;
+        // Proceed with substitution in the body if the formal argument doesn't match
+        return new FunExpr(formal_arg, body->subst(str, e));
     }
 }
 
@@ -643,7 +644,7 @@ void FunExpr::pretty_print_at(ostream &ostream, precedence_t prec, bool let_pare
 
 CallExpr::CallExpr(Expr *to_be_called, Expr *actual_arg){
     this->to_be_called = to_be_called;
-    this->actual_arg = actual_arg; 
+    this->actual_arg = actual_arg;
 }
 
 bool CallExpr::equals (Expr *e){
@@ -656,7 +657,7 @@ bool CallExpr::equals (Expr *e){
 }
 
 Val* CallExpr::interp(){
-    return to_be_called->interp()->call(actual_arg->interp());
+    return this->to_be_called->interp()->call(this->actual_arg->interp());
 }
 
 Expr* CallExpr::subst(string str, Expr* e){
