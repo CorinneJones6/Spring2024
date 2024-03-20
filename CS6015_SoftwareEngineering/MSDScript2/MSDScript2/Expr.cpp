@@ -496,10 +496,11 @@ bool IfExpr::equals (Expr *e){
 }
 
 Val* IfExpr::interp(){
-    if(if_->interp()->is_true()){
+    Val* conditionValue = if_->interp();
+    BoolVal* boolCondition = dynamic_cast<BoolVal*>(conditionValue);
+    if (boolCondition != nullptr && boolCondition->is_true()) {
         return then_->interp();
-    }
-    else {
+    } else {
         return else_->interp();
     }
 }
