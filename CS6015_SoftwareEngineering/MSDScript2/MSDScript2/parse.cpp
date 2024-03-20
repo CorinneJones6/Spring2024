@@ -130,7 +130,7 @@ Expr* parse_inner(istream &in) {
     
     else if (c == '(') {
         consume(in, '(');
-        Expr *e = parse_expr(in);
+        Expr *e = parse_comparg(in);
         skip_whitespace(in);
         c = in.get();
         if (c != ')'){
