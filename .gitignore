@@ -40,3 +40,15 @@ xcuserdata/
 *.xccheckout
 CS6013_ComputerSystems/A4_MallocReplacement/A4_MallocReplacement.xcodeproj/project.pbxproj
 *.pbxproj
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/client.csr
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/clientPrivate.key
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/config.cnf
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/index.txt
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/index.txt.attr
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/index.txt.attr.old
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/index.txt.old
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/serial
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/serial.old
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/server.csr
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/serverPrivate.key
+CS6014_Networks&Security/HW_TLS_Lite/TLSCheckpoint/Untitled.pages
