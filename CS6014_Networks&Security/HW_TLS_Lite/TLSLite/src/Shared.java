@@ -1,9 +1,8 @@
-import javax.crypto.Mac;
+import javax.crypto.*;
 import javax.crypto.spec.DHParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,12 +22,12 @@ public class Shared {
     private static final BigInteger N = new BigInteger("1"); // prime modulus, replace "..." with a large prime value
 
     //SESSION KEYS?
-    private static byte[] serverEncrypt;
-    private static byte[] clientEncrypt;
+    static byte[] serverEncrypt;
+    static byte[] clientEncrypt;
     static byte[] serverMAC;
     static byte[] clientMAC;
-    private static byte[] serverIV;
-    private static byte[] clientIV;
+    static byte[] serverIV;
+    static byte[] clientIV;
     static Certificate CACertificate;
 
     static {
@@ -147,7 +146,7 @@ public class Shared {
         System.arraycopy(okm, 0, result, 0, 16);
         return result;
     }
-    //TODO: Make sure this using the nonce and the master key appropriately
+    //TODO: Make sure this using the nonce and the master key appropriately?
     static void generateSessionKeys(byte[] clientNonce, byte[] masterKey) throws NoSuchAlgorithmException, InvalidKeyException {
         byte[] prk = hkdfExpand(masterKey, "masterKey" + new String(clientNonce, StandardCharsets.UTF_8));
         serverEncrypt = hkdfExpand(prk, "server encrypt");
@@ -157,38 +156,66 @@ public class Shared {
         serverIV = hkdfExpand(clientMAC, "server IV");
         clientIV = hkdfExpand(serverIV, "client IV");
 
-        System.out.println("YOU ARE THE WINNER");
+//        printKeyInformation();
+        System.out.println("Session keys generated");
     }
 
-    public static byte[] generateMacMessage(ArrayList<byte[]> message, byte[] key) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    public static byte[] generateMacMessage(byte[] message, byte[] key) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac HMAC = Mac.getInstance("HmacSHA256");
 
-        // Generate a new key from macKey and initialize the Mac instance with the new key
+        //Generate a new key from macKey and initializes the Mac instance with the new key
         SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA256");
         HMAC.init(secretKeySpec);
 
-        // Iterate through the ArrayList, updating the Mac instance with each byte array
-        for (byte[] messagePart : message) {
-            HMAC.update(messagePart);
-        }
-
-        // Compute the MAC
+        HMAC.update(message);
         return HMAC.doFinal();
 
     }
 
-    public static boolean verifyMessageHistory(byte[] otherHostMacMsg, ArrayList<byte[]> myMsgs, byte[] macKey) throws NoSuchAlgorithmException, IOException, InvalidKeyException {
-        byte[] myMacMsg = Shared.generateMacMessage(myMsgs, macKey);
-        return Arrays.equals(myMacMsg, otherHostMacMsg);
+    public static boolean verifyMessageHistory(byte[] otherHostMacMsg, byte[] thisHostMsg, byte[] macKey) throws NoSuchAlgorithmException, InvalidKeyException {
+        byte[] thisHostMacMsg = Shared.generateMacMessage(thisHostMsg, macKey);
+        return Arrays.equals(thisHostMacMsg, otherHostMacMsg);
     }
 
-    public static void encryptMessage(){
+    private static Cipher generateCipher(byte[] key, byte[] iv, int mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+        SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
+        Cipher encryptCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        encryptCipher.init(mode, keySpec, ivSpec);
+
+        return encryptCipher;
     }
-    public static void decryptMessage(){
 
+    public static byte[] encryptMessage(String message, byte[] MACkey, byte[] encryptKey, byte[] hostIV) throws IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+        byte[] message_bytes = message.getBytes();
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        outStream.write(message_bytes);
+
+        byte[] hmac = Shared.generateMacMessage(message_bytes, MACkey);
+        outStream.write(hmac);
+        Cipher cipher = generateCipher(encryptKey, hostIV, Cipher.ENCRYPT_MODE);
+
+        return cipher.doFinal(outStream.toByteArray());
+    }
+    public static String decryptMessage(byte[] encryptedData, byte[]decriptKey, byte[] hostIV, byte[]MACkey) throws InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        Cipher cipher = generateCipher(decriptKey, hostIV, Cipher.DECRYPT_MODE);
+        byte[] decryptedData = cipher.doFinal(encryptedData);
+
+        // Assuming the last part of the decrypted data is the HMAC and the rest is the message
+
+        byte[] messageBytes = Arrays.copyOf(decryptedData, decryptedData.length-32);
+
+        return new String(messageBytes, StandardCharsets.UTF_8);
     }
 
-
+    public static void printKeyInformation() {
+        System.out.println("Server Encrypt: " + bytesToHex(serverEncrypt));
+        System.out.println("Client Encrypt: " + bytesToHex(clientEncrypt));
+        System.out.println("Server MAC: " + bytesToHex(serverMAC));
+        System.out.println("Client MAC: " + bytesToHex(clientMAC));
+        System.out.println("Server IV: " + bytesToHex(serverIV));
+        System.out.println("Client IV: " + bytesToHex(clientIV));
+    }
 
 }
