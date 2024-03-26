@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,17 +8,18 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Client {
     private BigInteger clientDHPrivateKey;
     private BigInteger clientDHPublicKey;
     private BigInteger masterKey;
-    private ArrayList<byte[]> messageHistory = new ArrayList<>();
+    private ByteArrayOutputStream messageHistory = new ByteArrayOutputStream();
     final static String HOST = "localhost";
     final static int PORT_NUM = 8080;
 
-    public void addMessage(final byte[] message){
-        messageHistory.add(message);
+    public void addMessage(final byte[] message) throws IOException {
+        messageHistory.write(message);
     }
     public void initializeDHPrivateKey(BigInteger dhPrivateKey){
         this.clientDHPrivateKey = dhPrivateKey;
@@ -38,7 +40,7 @@ public class Client {
         return masterKey;
     }
 
-    private ArrayList<byte[]> getMessageHistory(){
+    private ByteArrayOutputStream getMessageHistory(){
         return messageHistory;
     }
 
@@ -90,9 +92,8 @@ public class Client {
         System.out.println("Client received message 2" + "\n");
 
 
-        //Message 3: Send a) certificate, b) DHPublicKey, c) signed DHPublicKey
+        //Message 3: Send a. certificate, b. DHPublicKey, c. signed DHPublicKey
         Certificate clientCertificate = Shared.getHostCertificate("client");
-//        PublicKey clientRSAPublicKey = clientCertificate.getPublicKey();
         byte[] clientSignedDHKey_Byte = Shared.generateSignedDHKey("client", client.getClientDHPublicKey());
 
         os.writeObject(clientCertificate);
@@ -112,25 +113,35 @@ public class Client {
             socket.close();
         }
 
+
         //Message 4: Receive HMAC msg of history so far
         byte[] serverHMACMessage = (byte[])is.readObject();
-        client.addMessage(serverHMACMessage);
         System.out.println("Client received message 4");
 
 
         //Message 5: Send HMAC msg of history so far
-        byte[] clientHMACMessage = Shared.generateMacMessage(client.getMessageHistory(), Shared.clientMAC);
-        os.writeObject(clientHMACMessage);
-        client.addMessage(clientHMACMessage);
+        os.writeObject(Shared.generateMacMessage(client.getMessageHistory().toByteArray(), Shared.clientMAC));
         System.out.println("Client sent message 5");
 
         //VERIFY VALID HMAC
-        if(Shared.verifyMessageHistory(serverHMACMessage, client.getMessageHistory(), Shared.clientMAC)){
-            System.out.println("CLIENT HANDSHAKE COMPLETED YESSSS QUEEN");
+        if(Shared.verifyMessageHistory(serverHMACMessage, client.getMessageHistory().toByteArray(), Shared.serverMAC)){
+            System.out.println("CLIENT HANDSHAKE COMPLETED");
         }
         else {
-            System.out.println("NOT THE SAME DUMMY");
+            System.out.println("HMAC MESSAGES WERE NOT THE SAME");
         }
+
+        //MESSAGING
+
+        //Recieve 1st message
+        byte[] receivedMsg_encrypted = (byte[])is.readObject();
+        String receivedMsg = Shared.decryptMessage(receivedMsg_encrypted, Shared.serverEncrypt, Shared.serverIV, Shared.serverMAC);
+        System.out.println("Client received message: " + receivedMsg);
+
+        //send acknowledgement
+        String ackMsg = "Message Received";
+        byte[] ackMsg_encrypted = Shared.encryptMessage(ackMsg, Shared.clientMAC, Shared.clientEncrypt, Shared.clientIV);
+        os.writeObject(ackMsg_encrypted);
 
         socket.close();
 
