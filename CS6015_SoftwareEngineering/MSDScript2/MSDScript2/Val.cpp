@@ -137,7 +137,6 @@ bool FunVal::is_true(){
 }
 
 Val* FunVal::call(Val* actual_arg){
-    //TODO: is this correct?
     Expr* actualExpr = actual_arg->to_expr();
     
     return body->subst(formal_arg, actualExpr)->interp();

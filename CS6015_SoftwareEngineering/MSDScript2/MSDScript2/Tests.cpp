@@ -771,10 +771,6 @@ TEST_CASE("Testing FunExpr") {
         CHECK(funVal->body->equals(body));
     }
     
-    SECTION("Testing subst()") {
-
-    }
-    
     SECTION("Testing print()") {
         stringstream ss;
         Expr* body = new NumExpr(3);
@@ -807,21 +803,13 @@ TEST_CASE("Testing CallExpr") {
         CHECK(!callExpr1->equals(callExprDifferentArg)); // False, different argument
     }
     
-    SECTION("Testing interp()") {
- 
-    }
-    
-    SECTION("Testing subst()") {
-
-    }
-    
     SECTION("Testing print()") {
         stringstream ss;
         Expr* toBeCalled = new VarExpr("f");
         Expr* actualArg = new NumExpr(3);
-        CallExpr callExpr(toBeCalled, actualArg);
+        CallExpr* callExpr = new CallExpr(toBeCalled, actualArg);
 
-        callExpr.print(ss);
+        callExpr->print(ss);
         CHECK(ss.str() == "(f) (3)");
     }
 }
