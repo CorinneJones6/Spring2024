@@ -1,14 +1,11 @@
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.security.*;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Client {
     private BigInteger clientDHPrivateKey;
@@ -59,91 +56,57 @@ public class Client {
 
         return nonce;
     }
-    public static void main(String[] args) throws Exception {
-
-        //establish a connection with the server
-        Socket socket = new Socket(HOST, PORT_NUM);
-        System.out.println("Connection established with: " + HOST);
-        ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
-
-        //MESSAGE 1: Client send Nonce
-        Client client = new Client();
-        byte[] nonce = client.generateNonce();
+    private void completeHandShake(ObjectInputStream is, ObjectOutputStream os) throws Exception {
+        //Send the nonce
+        byte[] nonce = generateNonce();
         String nonceStr = Shared.bytesToHex(nonce);
         os.writeObject(nonce);
-        client.addMessage(nonce);
+        addMessage(nonce);
         System.out.println("Client sent nonce: " + nonceStr + "\n");
 
         //Generate DH Keys
         BigInteger[] dhKeyPair= Shared.generateDHKeyPair();
-        client.initializeDHPrivateKey(dhKeyPair[0]);
-        client.initializeDHPublicKey(dhKeyPair[1]);
+        initializeDHPrivateKey(dhKeyPair[0]);
+        initializeDHPublicKey(dhKeyPair[1]);
 
+        //Handle Certificate / Key Sharing
+        Certificate serverCertificate = Shared.receiveCertificateAndKeys(is, getMessageHistory());
+        Shared.sendCertificateAndKeys(os, getClientDHPublicKey(), getMessageHistory());
+
+        //Validate Certificate, Generate Master Key, Generate Session Keys
+        BigInteger masterKey = Shared.validateAndGenerateMasterandSessionKeys(nonce, serverCertificate, getClientDHPublicKey(), getClientDHPrivateKey());
+
+        //Store as a member variable
+        initializeMasterKey(masterKey);
+
+        //Receive and send Mac Msg
+        byte[] hmacMsg = Shared.receiveMacMsg(is);
+        Shared.generateMacMsg("client", os, getMessageHistory());
+        Shared.validateMacMsg("client", hmacMsg, getMessageHistory());
+    }
+
+    private void completeMessages(ObjectOutputStream os, ObjectInputStream is) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, ClassNotFoundException {
+        String receivedMsg = Shared.receiveEncryptedMessage("client", is);
+        System.out.println(receivedMsg);
+
+        String helloMsg = "Hello from the client!";
+        Shared.sendEncryptedMessage("client", os, helloMsg);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        //Establish a connection with the server
+        Socket socket = new Socket(HOST, PORT_NUM);
+        System.out.println("Connection established with: " + HOST);
+
+        ObjectOutputStream os = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream is = new ObjectInputStream(socket.getInputStream());
 
-        //MESSAGE 2: Receive a) certificate, b) DHPublicKey c) signed DHPublicKey
-        Certificate serverCertificate = (Certificate)is.readObject();
-        client.addMessage(serverCertificate.toString().getBytes());
-        BigInteger serverDHPublicKey = (BigInteger)is.readObject();
-        client.addMessage(serverDHPublicKey.toByteArray());
-        byte[] serverSignedDHKey = (byte[]) is.readObject();
-        //need to decrypt the signed DH Key
-        client.addMessage(serverSignedDHKey);
-        System.out.println("Client received message 2" + "\n");
+        Client client = new Client();
+        client.completeHandShake(is, os);
 
-
-        //Message 3: Send a. certificate, b. DHPublicKey, c. signed DHPublicKey
-        Certificate clientCertificate = Shared.getHostCertificate("client");
-        byte[] clientSignedDHKey_Byte = Shared.generateSignedDHKey("client", client.getClientDHPublicKey());
-
-        os.writeObject(clientCertificate);
-        client.addMessage(clientCertificate.toString().getBytes());
-        os.writeObject(client.getClientDHPublicKey());
-        client.addMessage(client.getClientDHPublicKey().toByteArray());
-        os.writeObject(clientSignedDHKey_Byte);
-        client.addMessage(clientSignedDHKey_Byte);
-        System.out.println("Client sent message 3");
-
-        if(Shared.validateCertificate(serverCertificate)){
-            client.initializeMasterKey(Shared.generateMasterKey(client.getClientDHPublicKey(), client.getClientDHPrivateKey()));
-            Shared.generateSessionKeys(nonce, client.getMasterKey().toByteArray());
-        }
-        else{
-            //todo: figure out what to do if does not validate
-            socket.close();
-        }
-
-
-        //Message 4: Receive HMAC msg of history so far
-        byte[] serverHMACMessage = (byte[])is.readObject();
-        System.out.println("Client received message 4");
-
-
-        //Message 5: Send HMAC msg of history so far
-        os.writeObject(Shared.generateMacMessage(client.getMessageHistory().toByteArray(), Shared.clientMAC));
-        System.out.println("Client sent message 5");
-
-        //VERIFY VALID HMAC
-        if(Shared.verifyMessageHistory(serverHMACMessage, client.getMessageHistory().toByteArray(), Shared.serverMAC)){
-            System.out.println("CLIENT HANDSHAKE COMPLETED");
-        }
-        else {
-            System.out.println("HMAC MESSAGES WERE NOT THE SAME");
-        }
-
-        //MESSAGING
-
-        //Recieve 1st message
-        byte[] receivedMsg_encrypted = (byte[])is.readObject();
-        String receivedMsg = Shared.decryptMessage(receivedMsg_encrypted, Shared.serverEncrypt, Shared.serverIV, Shared.serverMAC);
-        System.out.println("Client received message: " + receivedMsg);
-
-        //send acknowledgement
-        String ackMsg = "Message Received";
-        byte[] ackMsg_encrypted = Shared.encryptMessage(ackMsg, Shared.clientMAC, Shared.clientEncrypt, Shared.clientIV);
-        os.writeObject(ackMsg_encrypted);
+        client.completeMessages(os, is);
 
         socket.close();
-
     }
 }

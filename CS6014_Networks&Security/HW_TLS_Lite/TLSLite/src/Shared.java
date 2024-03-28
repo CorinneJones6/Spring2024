@@ -1,5 +1,4 @@
 import javax.crypto.*;
-import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
@@ -13,15 +12,12 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 
 public class Shared {
     private static final BigInteger g = new BigInteger("2"); // base generator
-    private static final BigInteger N = new BigInteger("1"); // prime modulus, replace "..." with a large prime value
-
-    //SESSION KEYS?
+    private static final BigInteger N = new BigInteger("1"); // prime modulus
     static byte[] serverEncrypt;
     static byte[] clientEncrypt;
     static byte[] serverMAC;
@@ -69,7 +65,7 @@ public class Shared {
         }
     }
 
-    public static BigInteger[] generateDHKeyPair() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException {
+    public static BigInteger[] generateDHKeyPair() {
         BigInteger[] returnArray = new BigInteger[2];
 
         BigInteger privateKey = generateDHPrivateKey(N.bitLength());
@@ -90,7 +86,7 @@ public class Shared {
         return g.modPow(privateKey, N);
     }
 
-    //TODO: figure out how to encrypt this information
+    //TODO: figure out how to encrypt this information???
     private static PrivateKey generateRSAPrivateKey(String filepath) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] keyBytes = Files.readAllBytes(Paths.get(filepath));
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
@@ -203,6 +199,7 @@ public class Shared {
         byte[] decryptedData = cipher.doFinal(encryptedData);
 
         // Assuming the last part of the decrypted data is the HMAC and the rest is the message
+        //todo: check the hmac?
 
         byte[] messageBytes = Arrays.copyOf(decryptedData, decryptedData.length-32);
 
@@ -216,6 +213,120 @@ public class Shared {
         System.out.println("Client MAC: " + bytesToHex(clientMAC));
         System.out.println("Server IV: " + bytesToHex(serverIV));
         System.out.println("Client IV: " + bytesToHex(clientIV));
+    }
+
+            /*----------------------------------------------------------------------
+                                     SHARED HANDSHAKE METHODS
+         ----------------------------------------------------------------------*/
+
+    public static void sendCertificateAndKeys(ObjectOutputStream os, BigInteger dhPublicKey, ByteArrayOutputStream msgHistory) throws Exception {
+        //MESSAGE 2: Send a) certificate, b) DHPublicKey, c) signed DHPublicKey
+        Certificate serverCertificate = Shared.getHostCertificate("server");
+        byte[] serverSignedDHKey_Bytes = Shared.generateSignedDHKey("server", dhPublicKey);
+
+        os.writeObject(serverCertificate);
+        msgHistory.write(serverCertificate.toString().getBytes());
+        os.writeObject(dhPublicKey);
+        msgHistory.write(dhPublicKey.toByteArray());
+        os.writeObject(serverSignedDHKey_Bytes);
+        msgHistory.write(serverSignedDHKey_Bytes);
+        System.out.println("Certificate and Keys sent");
+    }
+
+    public static Certificate receiveCertificateAndKeys(ObjectInputStream is, ByteArrayOutputStream msgHistory) throws IOException, ClassNotFoundException {
+        //MESSAGE 3: Receive a. certificate, b. DHPublicKey c. signed DHPublicKey
+        Certificate clientCertificate = (Certificate)is.readObject();
+        msgHistory.write(clientCertificate.toString().getBytes());
+        BigInteger clientDHPublicKey = (BigInteger)is.readObject();
+        msgHistory.write(clientDHPublicKey.toByteArray());
+        byte[] clientSignedDHKey = (byte[])is.readObject();
+        //need to encrypt the signed key prior to sending
+        msgHistory.write(clientSignedDHKey);
+        System.out.println("Certificate and Keys received");
+        return clientCertificate;
+    }
+
+    public static BigInteger validateAndGenerateMasterandSessionKeys(byte[] nonce, Certificate certificate, BigInteger dhPublicKey, BigInteger dhPrivateKey) throws NoSuchAlgorithmException, InvalidKeyException {
+        if(Shared.validateCertificate(certificate)){
+            BigInteger masterKey = Shared.generateMasterKey(dhPublicKey, dhPrivateKey);
+            Shared.generateSessionKeys(nonce, masterKey.toByteArray());
+            return masterKey;
+        }
+        else{
+            //todo: figure out what to do if does not validate
+//            is.close();
+//            socket.close();
+//            ss.close();
+            return null;
+        }
+    }
+
+    public static void generateMacMsg(String caller, ObjectOutputStream os, ByteArrayOutputStream msgHistory) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+        //MESSAGE 4: Send HMAC msg of history so far
+        byte[] key;
+        if(caller.equals("server")) {
+            key = Shared.serverMAC;
+        }
+        else{
+            key = Shared.clientMAC;
+        }
+            byte[] msg = Shared.generateMacMessage(msgHistory.toByteArray(), key);
+            os.writeObject(msg);
+            System.out.println("Mac msg sent");
+
+    }
+
+    public static byte[] receiveMacMsg(ObjectInputStream is) throws IOException, ClassNotFoundException {
+        byte[] clientHMACMessage = (byte[])is.readObject();
+        System.out.println("Mac msg received");
+
+        return clientHMACMessage;
+    }
+
+
+    public static void validateMacMsg(String caller, byte[] msg, ByteArrayOutputStream msgHistory) throws NoSuchAlgorithmException, InvalidKeyException {
+        //VERIFY VALID HMAC
+        byte[] key;
+        if(caller.equals("server")) {
+            key = Shared.clientMAC;
+        }
+        else{
+            key = Shared.serverMAC;
+        }
+        if(Shared.verifyMessageHistory(msg, msgHistory.toByteArray(), key)){
+            System.out.println("SERVER HANDSHAKE COMPLETED");
+        }
+        else {
+            System.out.println("HMAC MESSAGES WERE NOT THE SAME");
+        }
+    }
+
+                /*----------------------------------------------------------------------
+                                     SHARED MESSAGE METHODS
+         ----------------------------------------------------------------------*/
+
+    public static void sendEncryptedMessage(String caller, ObjectOutputStream os, String msg) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+
+        if(caller.equals("server")){
+            byte[] message1_encrypted = Shared.encryptMessage(msg, Shared.serverMAC, Shared.serverEncrypt, Shared.serverIV);
+            os.writeObject(message1_encrypted);
+        }
+        else {
+
+            byte[] message1_encrypted = Shared.encryptMessage(msg, Shared.clientMAC, Shared.clientEncrypt, Shared.clientIV);
+            os.writeObject(message1_encrypted);
+        }
+
+    }
+    public static String receiveEncryptedMessage(String caller, ObjectInputStream is) throws IOException, ClassNotFoundException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        if(caller.equals("server")) {
+            byte[] receivedMsg_encrypted = (byte[]) is.readObject();
+            return Shared.decryptMessage(receivedMsg_encrypted, Shared.clientEncrypt, Shared.clientIV, Shared.clientMAC);
+        }
+        else {
+            byte[] receivedMsg_encrypted = (byte[]) is.readObject();
+            return Shared.decryptMessage(receivedMsg_encrypted, Shared.serverEncrypt, Shared.serverIV, Shared.serverMAC);
+        }
     }
 
 }
