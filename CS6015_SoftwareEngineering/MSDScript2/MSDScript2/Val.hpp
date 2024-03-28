@@ -10,24 +10,27 @@
 #include <stdio.h>
 #include <string>
 #include "Expr.hpp"
+#include "pointer.h"
 
 using namespace std;
 class Expr;
 
 //======================  Val  ======================//
 
-class Val {
+CLASS( Val ){
 public:
-    virtual bool equals (Val* v)=0;
-    virtual Expr* to_expr()=0;
-    virtual Val* add_to(Val* other_val)=0;
-    virtual Val* mult_with(Val* other_val)=0;
+    virtual bool equals (PTR(Val) v)=0;
+    virtual PTR(Expr) to_expr()=0;
+    virtual PTR(Val) add_to(PTR(Val) other_val)=0;
+    virtual PTR(Val) mult_with(PTR(Val) other_val)=0;
     virtual void print(ostream &ostream)=0;
     virtual bool is_true()=0;
     
     string to_string();
     
-    virtual Val* call(Val* actual_arg) = 0;
+    virtual PTR(Val) call(PTR(Val) actual_arg) = 0;
+    
+    virtual ~Val() {};
 };
 
 //======================  NumVal  ======================//
@@ -37,14 +40,14 @@ public:
     int val;
     NumVal(int i);
     
-    virtual Expr* to_expr();
-    virtual bool equals (Val *v);
-    virtual Val* add_to(Val* other_val);
-    virtual Val* mult_with(Val* other_val);
+    virtual PTR(Expr) to_expr();
+    virtual bool equals (PTR(Val) v);
+    virtual PTR(Val) add_to(PTR(Val) other_val);
+    virtual PTR(Val) mult_with(PTR(Val) other_val);
     virtual void print(ostream &ostream);
     virtual bool is_true();
     
-    virtual Val* call(Val* actual_arg);
+    virtual PTR(Val) call(PTR(Val) actual_arg);
 };
 
 //======================  BoolVal  ======================//
@@ -54,14 +57,14 @@ public:
     bool val;
     BoolVal(bool b);
     
-    virtual Expr* to_expr();
-    virtual bool equals (Val *v);
-    virtual Val* add_to(Val* other_val);
-    virtual Val* mult_with(Val* other_val);
+    virtual PTR(Expr) to_expr();
+    virtual bool equals (PTR(Val) v);
+    virtual PTR(Val) add_to(PTR(Val) other_val);
+    virtual PTR(Val) mult_with(PTR(Val) other_val);
     virtual void print(ostream &ostream);
     virtual bool is_true();
     
-    virtual Val* call(Val* actual_arg);
+    virtual PTR(Val) call(PTR(Val) actual_arg);
 };
 
 //======================  FunVal  ======================//
@@ -69,16 +72,16 @@ public:
 class FunVal : public Val {
 public: 
     string formal_arg;
-    Expr *body;
+    PTR(Expr) body;
     
-    FunVal(string formal_arg, Expr *body);
+    FunVal(string formal_arg, PTR(Expr) body);
     
-    virtual Expr* to_expr();
-    virtual bool equals (Val *v);
-    virtual Val* add_to(Val* other_val);
-    virtual Val* mult_with(Val* other_val);
+    virtual PTR(Expr) to_expr();
+    virtual bool equals (PTR(Val) v);
+    virtual PTR(Val) add_to(PTR(Val) other_val);
+    virtual PTR(Val) mult_with(PTR(Val) other_val);
     virtual void print(ostream &ostream);
     virtual bool is_true();
     
-    virtual Val* call(Val* actual_arg);
+    virtual PTR(Val) call(PTR(Val) actual_arg);
 };

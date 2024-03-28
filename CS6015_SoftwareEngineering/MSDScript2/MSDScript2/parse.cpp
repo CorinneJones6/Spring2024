@@ -6,7 +6,7 @@
  * \param s The string from which the expression is parsed.
  * \return Pointer to the parsed expression object.
  */
-Expr* parse_str(string s){
+PTR(Expr) parse_str(string s){
     istringstream in(s);
     return parse(in);
 }
@@ -17,8 +17,8 @@ Expr* parse_str(string s){
  * \param in Reference to input stream from which the expression is read.
  * \return Pointer to the parsed expression object.
  */
-Expr* parse(istream &in) {
-    Expr* e;
+PTR(Expr) parse(istream &in) {
+    PTR(Expr) e;
     e = parse_expr(in);
     skip_whitespace(in);
     if ( !in.eof() ) {
@@ -28,8 +28,8 @@ Expr* parse(istream &in) {
     return e;
 }
 
-Expr *parse_expr(istream &in){
-    Expr* e = parse_comparg(in);
+PTR(Expr) parse_expr(istream &in){
+    PTR(Expr) e = parse_comparg(in);
     skip_whitespace(in);
     if(in.peek() == '='){
         consume(in, '=');
@@ -37,8 +37,8 @@ Expr *parse_expr(istream &in){
             throw runtime_error("need '==' to indicate equal check") ;
         }
         consume(in, '=');
-        Expr* rhs = parse_expr(in);
-        return new EqExpr(e, rhs);
+        PTR(Expr) rhs = parse_expr(in);
+        return NEW(EqExpr)(e, rhs);
     }
     return e;
 }
@@ -49,16 +49,16 @@ Expr *parse_expr(istream &in){
  * \param in Reference to input stream from which the expression is read.
  * \return Pointer to the parsed expression object.
  */
-Expr* parse_comparg(istream &in) {
+PTR(Expr) parse_comparg(istream &in) {
     
-    Expr *e = parse_addend(in);
+    PTR(Expr) e = parse_addend(in);
 
     skip_whitespace(in);
 
     if (in.peek() == '+') {
         consume(in, '+');
-        Expr *rhs = parse_comparg(in);
-        return new AddExpr(e, rhs);
+        PTR(Expr) rhs = parse_comparg(in);
+        return NEW( AddExpr)(e, rhs) ;
     }
     return e;
 }
@@ -69,9 +69,9 @@ Expr* parse_comparg(istream &in) {
  * \param in Reference to input stream from which the addend is read.
  * \return Pointer to the parsed expression object.
  */
-Expr* parse_addend(istream &in) {
+PTR(Expr) parse_addend(istream &in) {
     
-    Expr *e = parse_multicand(in);
+    PTR(Expr) e = parse_multicand(in);
 
     skip_whitespace(in);
 
@@ -79,8 +79,8 @@ Expr* parse_addend(istream &in) {
     if (c == '*') {
         consume(in, '*');
         skip_whitespace(in) ;
-        Expr *rhs = parse_addend(in);
-        return new MultExpr(e, rhs);
+        PTR(Expr) rhs = parse_addend(in);
+        return NEW( MultExpr)(e, rhs);
     }
     
     return e ;
@@ -102,14 +102,14 @@ static string parse_term(istream &in){
     return term;
 }
 
-Expr* parse_multicand(istream &in){
-    Expr *expr = parse_inner(in);
+PTR(Expr) parse_multicand(istream &in){
+    PTR(Expr) expr = parse_inner(in);
 
     while(in.peek() == '('){
         consume(in, '(');
-        Expr* actual_arg = parse_expr(in);
+        PTR(Expr) actual_arg = parse_expr(in);
         consume(in, ')');
-        expr = new CallExpr(expr, actual_arg);
+        expr = NEW( CallExpr)(expr, actual_arg);
     }
     return expr;
 }
@@ -120,7 +120,7 @@ Expr* parse_multicand(istream &in){
  * \param in Reference to input stream from which the expression is read.
  * \return Pointer to the parsed expression object.
  */
-Expr* parse_inner(istream &in) {
+PTR(Expr) parse_inner(istream &in) {
     skip_whitespace(in);
     int c = in.peek();
     
@@ -130,7 +130,7 @@ Expr* parse_inner(istream &in) {
     
     else if (c == '(') {
         consume(in, '(');
-        Expr *e = parse_comparg(in);
+        PTR(Expr) e = parse_comparg(in);
         skip_whitespace(in);
         c = in.get();
         if (c != ')'){
@@ -152,10 +152,10 @@ Expr* parse_inner(istream &in) {
             return parse_let(in);
         }
         else if(term == "true"){
-            return new BoolExpr(true);
+            return NEW( BoolExpr)(true);
         }
         else if(term == "false"){
-            return new BoolExpr(false);
+            return NEW( BoolExpr)(false);
         }
         else if(term == "if"){
             return parse_if(in);
@@ -179,7 +179,7 @@ Expr* parse_inner(istream &in) {
  * \param in Reference to input stream from which the number is read.
  * \return Pointer to the created Num object representing the parsed number.
  */
-Expr* parse_num(istream &in) {
+PTR(Expr) parse_num(istream &in) {
     int n = 0;
     bool negative = false;
 
@@ -206,7 +206,7 @@ Expr* parse_num(istream &in) {
 
     if (negative)
         n = n * -1;
-    return new NumExpr(n);
+    return NEW( NumExpr)(n);
 }
 
 /**
@@ -237,26 +237,13 @@ static void skip_whitespace(istream &in) {
     }
 }
 
-///**
-// * Parses an expression from standard input.
-// *
-// * \return Pointer to the parsed expression object.
-// */
-//Expr* parse_input(){
-//    string input;
-//    getline( cin, input);
-//    cout << "input: " << input << endl;
-//    stringstream ss(input);
-//    return parse_comparg(ss);
-//}
-
 /**
  * Parses variable names from an input stream.
  *
  * \param in Reference to input stream from which the variable name is read.
  * \return Pointer to the Var object representing the parsed variable.
  */
-Expr* parse_var(istream &in) {
+PTR(Expr) parse_var(istream &in) {
     string str;
     while (true) {
         int c = in.peek();
@@ -267,7 +254,7 @@ Expr* parse_var(istream &in) {
             break;
         }
     }
-    return new VarExpr(str);
+    return NEW( VarExpr)(str);
 }
 
 /**
@@ -298,11 +285,11 @@ void consume_word(istream &in, string str){
  * \param in The input stream to parse from.
  * \return A pointer to the Let expression object.
  */
-Expr* parse_let(istream &in){
+PTR(Expr) parse_let(istream &in){
     
     skip_whitespace(in);
     
-    Expr *e = parse_var(in);
+    PTR(Expr) e = parse_var(in);
     
     string lhs = e->to_string();
     
@@ -312,7 +299,7 @@ Expr* parse_let(istream &in){
     
     skip_whitespace(in);
     
-    Expr *rhs = parse_comparg(in);
+    PTR(Expr) rhs = parse_comparg(in);
     
     skip_whitespace(in);
     
@@ -320,15 +307,15 @@ Expr* parse_let(istream &in){
     
     skip_whitespace(in);
     
-    Expr *body = parse_comparg(in);
+    PTR(Expr) body = parse_comparg(in);
     
-    return new LetExpr(lhs, rhs, body);
+    return NEW( LetExpr)(lhs, rhs, body);
 }
 
-Expr* parse_if(istream &in){
+PTR(Expr) parse_if(istream &in){
     skip_whitespace(in);
     
-    Expr* ifStatement = parse_expr(in);
+    PTR(Expr) ifStatement = parse_expr(in);
     
     skip_whitespace(in);
     
@@ -336,7 +323,7 @@ Expr* parse_if(istream &in){
     
     skip_whitespace(in);
     
-    Expr* thenStatement = parse_expr(in);
+    PTR(Expr) thenStatement = parse_expr(in);
     
     skip_whitespace(in);
     
@@ -344,17 +331,17 @@ Expr* parse_if(istream &in){
     
     skip_whitespace(in);
     
-    Expr* elseStatment = parse_expr(in);
+    PTR(Expr) elseStatment = parse_expr(in);
     
-    return new IfExpr(ifStatement, thenStatement, elseStatment);
+    return NEW( IfExpr)(ifStatement, thenStatement, elseStatment);
 }
 
-Expr* parse_fun(istream &in){
+PTR(Expr) parse_fun(istream &in){
     skip_whitespace(in);
     
     consume(in, '(');
     
-    Expr *e = parse_var(in);
+    PTR(Expr) e = parse_var(in);
     
     string var = e->to_string();
     
@@ -364,7 +351,7 @@ Expr* parse_fun(istream &in){
     
     e = parse_expr(in);
     
-    return new FunExpr(var, e);
+    return NEW( FunExpr)(var, e);
 }
 
 
