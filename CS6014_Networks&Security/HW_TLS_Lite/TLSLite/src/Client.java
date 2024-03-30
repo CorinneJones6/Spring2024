@@ -1,12 +1,18 @@
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.security.*;
 import java.security.cert.Certificate;
 
+/**
+ * Implements client-side operations for a TLS-light handshake and encrypted messaging.
+ * Facilitates secure session establishment with a server, including key exchanges,
+ * certificate handling, and message encryption/decryption, following a simplified
+ * TLS handshake protocol for cryptographic security.
+ *
+ * Created by Corinne Jones in 3/2024
+ *
+ */
 public class Client {
     private BigInteger clientDHPrivateKey;
     private BigInteger clientDHPublicKey;
@@ -56,36 +62,41 @@ public class Client {
 
         return nonce;
     }
-    private void completeHandShake(ObjectInputStream is, ObjectOutputStream os) throws Exception {
-        //Send the nonce
-        byte[] nonce = generateNonce();
-        String nonceStr = Shared.bytesToHex(nonce);
-        os.writeObject(nonce);
-        addMessage(nonce);
-        System.out.println("Client sent nonce: " + nonceStr + "\n");
+    private void completeHandShake(ObjectInputStream is, ObjectOutputStream os) {
+        try {
+            //Send the nonce
+            byte[] nonce = generateNonce();
+            String nonceStr = Shared.bytesToHex(nonce);
+            os.writeObject(nonce);
+            addMessage(nonce);
+            System.out.println("Client sent nonce: " + nonceStr + "\n");
 
-        //Generate DH Keys
-        BigInteger[] dhKeyPair= Shared.generateDHKeyPair();
-        initializeDHPrivateKey(dhKeyPair[0]);
-        initializeDHPublicKey(dhKeyPair[1]);
+            //Generate DH Keys
+            BigInteger[] dhKeyPair = Shared.generateDHKeyPair();
+            initializeDHPrivateKey(dhKeyPair[0]);
+            initializeDHPublicKey(dhKeyPair[1]);
 
-        //Handle Certificate / Key Sharing
-        Certificate serverCertificate = Shared.receiveCertificateAndKeys(is, getMessageHistory());
-        Shared.sendCertificateAndKeys(os, getClientDHPublicKey(), getMessageHistory());
+            //Handle Certificate / Key Sharing
+            Certificate serverCertificate = Shared.receiveCertificateAndKeys(is, getMessageHistory());
+            Shared.sendCertificateAndKeys(os, getClientDHPublicKey(), getMessageHistory());
 
-        //Validate Certificate, Generate Master Key, Generate Session Keys
-        BigInteger masterKey = Shared.validateAndGenerateMasterandSessionKeys(nonce, serverCertificate, getClientDHPublicKey(), getClientDHPrivateKey());
+            //Validate Certificate, Generate Master Key, Generate Session Keys
+            BigInteger masterKey = Shared.validateAndGenerateMasterandSessionKeys(nonce, serverCertificate, getClientDHPublicKey(), getClientDHPrivateKey());
 
-        //Store as a member variable
-        initializeMasterKey(masterKey);
+            //Store as a member variable
+            initializeMasterKey(masterKey);
 
-        //Receive and send Mac Msg
-        byte[] hmacMsg = Shared.receiveMacMsg(is);
-        Shared.generateMacMsg("client", os, getMessageHistory());
-        Shared.validateMacMsg("client", hmacMsg, getMessageHistory());
+            //Receive and send Mac Msg
+            byte[] hmacMsg = Shared.receiveMacMsg(is);
+            Shared.generateMacMsg("client", os, getMessageHistory());
+            Shared.validateMacMsg("client", hmacMsg, getMessageHistory());
+        }
+        catch(IOException e){
+            throw new RuntimeException("Failed to complete the handshake: " + e.getMessage(), e);
+        }
     }
 
-    private void completeMessages(ObjectOutputStream os, ObjectInputStream is) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, ClassNotFoundException {
+    private void completeMessages(ObjectOutputStream os, ObjectInputStream is)  {
         String receivedMsg = Shared.receiveEncryptedMessage("client", is);
         System.out.println(receivedMsg);
 
@@ -95,7 +106,6 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
 
-        //Establish a connection with the server
         Socket socket = new Socket(HOST, PORT_NUM);
         System.out.println("Connection established with: " + HOST);
 

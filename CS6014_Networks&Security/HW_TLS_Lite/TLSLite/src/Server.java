@@ -1,15 +1,16 @@
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.net.ServerSocket;
-
+/**
+ * Handles server-side operations for a TLS-light handshake and secure messaging with a client.
+ * Manages secure session setup, including key exchanges, certificate validation, and encrypted
+ * communication, adhering to a simplified TLS handshake protocol for cryptographic security.
+ *
+ * Created by Corinne Jones in 3/2024
+ *
+ */
 public class Server {
     final int PORT_NUM = 8080;
     private BigInteger serverDHPrivateKey;
@@ -41,50 +42,48 @@ public class Server {
         return msgHistoryStream;
     }
 
-
-
     private byte[] retrieveNonce(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        //MESSAGE 1: Read nonce
         byte[] nonce = (byte[]) is.readObject();
         String nonceStr = Shared.bytesToHex(nonce);
         writeMessage(nonce);
         System.out.println("Server received nonce: "  + nonceStr + "\n");
         return nonce;
     }
+    private void completeHandShake(ObjectInputStream is, ObjectOutputStream os) {
+        try {
+            byte[] nonce = retrieveNonce(is);
 
+            //Generate DH Keys
+            BigInteger[] dhKeyPair = Shared.generateDHKeyPair();
+            setDHPrivateKey(dhKeyPair[0]);
+            setDHPublicKey(dhKeyPair[1]);
 
-    private void completeHandShake(ObjectInputStream is, ObjectOutputStream os) throws Exception {
-        byte[] nonce = retrieveNonce(is);
+            Shared.sendCertificateAndKeys(os, getServerDHPublicKey(), getMsgHistoryStream());
 
-        //Generate DH Keys
-        BigInteger[] dhKeyPair = Shared.generateDHKeyPair();
-        setDHPrivateKey(dhKeyPair[0]);
-        setDHPublicKey(dhKeyPair[1]);
+            Certificate certificate = Shared.receiveCertificateAndKeys(is, getMsgHistoryStream());
 
-        Shared.sendCertificateAndKeys(os, getServerDHPublicKey(), getMsgHistoryStream());
+            BigInteger masterKey = Shared.validateAndGenerateMasterandSessionKeys(nonce, certificate, getServerDHPublicKey(), getServerDHPrivateKey());
 
-        Certificate certificate = Shared.receiveCertificateAndKeys(is, getMsgHistoryStream());
+            setMasterKey(masterKey);
 
-        BigInteger masterKey = Shared.validateAndGenerateMasterandSessionKeys(nonce, certificate, getServerDHPublicKey(), getServerDHPrivateKey());
+            Shared.generateMacMsg("server", os, getMsgHistoryStream());
 
-        setMasterKey(masterKey);
+            byte[] hmacMsg = Shared.receiveMacMsg(is);
 
-        Shared.generateMacMsg("server", os, getMsgHistoryStream());
-
-        byte[] hmacMsg = Shared.receiveMacMsg(is);
-
-        Shared.validateMacMsg("server", hmacMsg, getMsgHistoryStream());
+            Shared.validateMacMsg("server", hmacMsg, getMsgHistoryStream());
+        }
+        catch (IOException | ClassNotFoundException e){
+            throw new RuntimeException("Failed to complete the handshake: " + e.getMessage(), e);
+        }
 
     }
-
-    private void completeMessages(ObjectOutputStream os, ObjectInputStream is) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, ClassNotFoundException {
+    private void completeMessages(ObjectOutputStream os, ObjectInputStream is) {
         String helloMsg = "Hello from the server!";
         Shared.sendEncryptedMessage("server", os, helloMsg);
 
         String receivedMsg = Shared.receiveEncryptedMessage("server", is);
         System.out.println(receivedMsg);
     }
-
     public static void main(String[] args) throws Exception {
 
         Server server = new Server();
