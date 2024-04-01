@@ -15,7 +15,6 @@
 #include "Val.hpp"
 #include "catch.h"
 #include "parse.hpp"
-#include "env.hpp"
 
 
 TEST_CASE("NUM TESTS"){
