@@ -79,8 +79,11 @@ bool AddExpr::equals(PTR(Expr) e) {
  * \brief Interprets the addition of expressions.
  * \return The result of the addition.
  */
-PTR(Val) AddExpr:: interp(){
-    return this->lhs->interp()->add_to(this->rhs->interp());
+PTR(Val) AddExpr::interp(PTR(Env) env){
+    if(env == nullptr) {
+        env = Env::empty;
+    }
+    return this->lhs->interp(env)->add_to(this->rhs->interp(env));
 }
 
 /**
@@ -89,9 +92,9 @@ PTR(Val) AddExpr:: interp(){
  * \param e The expression to substitute with.
  * \return The new expression after substitution.
  */
-PTR(Expr) AddExpr::subst(string str, PTR(Expr) e){
-    return NEW(AddExpr) (this->lhs->subst(str, e), this->rhs->subst(str, e));
-}
+//PTR(Expr) AddExpr::subst(string str, PTR(Expr) e){
+//    return NEW(AddExpr) (this->lhs->subst(str, e), this->rhs->subst(str, e));
+//}
 
 /**
  * \brief Prints the addition expression.
@@ -154,8 +157,11 @@ if(multPtr==nullptr){
  * \brief Evaluates the multiplication of the two expressions.
  * \return The integer result of the multiplication.
  */
-PTR(Val) MultExpr:: interp() {
-    return this->lhs->interp()->mult_with(this->rhs->interp());
+PTR(Val) MultExpr::interp(PTR(Env) env){
+    if(env == nullptr) {
+        env = Env::empty;
+    }
+    return this->lhs->interp(env)->mult_with(this->rhs->interp(env));
 }
 
 /**
@@ -164,9 +170,9 @@ PTR(Val) MultExpr:: interp() {
  * \param e The expression to replace it with.
  * \return A new expression with the substitution made.
  */
-PTR(Expr) MultExpr::subst(string str, PTR(Expr) e){
-    return NEW(MultExpr) (this->lhs->subst(str, e), this->rhs->subst(str, e));
-}
+//PTR(Expr) MultExpr::subst(string str, PTR(Expr) e){
+//    return NEW(MultExpr) (this->lhs->subst(str, e), this->rhs->subst(str, e));
+//}
 
 /**
  * \brief Prints the expression to the provided output stream.
@@ -229,7 +235,7 @@ bool NumExpr::equals (PTR(Expr) e) {
  * \brief Evaluates to its numeric value.
  * \return The value of the numeric constant.
  */
-PTR(Val) NumExpr:: interp(){
+PTR(Val) NumExpr::interp(PTR(Env) env){
     return NEW(NumVal)(val) ;
 }
 
@@ -239,9 +245,9 @@ PTR(Val) NumExpr:: interp(){
  * \param e The expression to substitute in place of the variable.
  * \return A pointer to this numeric constant, as no substitution occurs.
  */
-PTR(Expr) NumExpr::subst(string str, PTR(Expr) e){
-    return THIS;
-}
+//PTR(Expr) NumExpr::subst(string str, PTR(Expr) e){
+//    return THIS;
+//}
 
 /**
  * \brief Prints the numeric value to the specified output stream.
@@ -278,8 +284,8 @@ bool VarExpr::equals (PTR(Expr) e) {
  * \brief Throws an exception since variables cannot be directly interpreted.
  * \throws std::runtime_error when attempted to interpret a variable.
  */
-PTR(Val) VarExpr::interp(){
-    throw runtime_error("Var cannot be converted to a number");
+PTR(Val) VarExpr::interp(PTR(Env) env){
+    return env->lookup(this->val);
 }
 
 /**
@@ -288,14 +294,14 @@ PTR(Val) VarExpr::interp(){
  * \param e The expression to substitute in place of the variable.
  * \return The original variable or the substitution.
  */
-PTR(Expr) VarExpr::subst(string str, PTR(Expr) e){
-    if(val==str){
-        return e;
-    }
-    else {
-        return THIS;
-    }
-}
+//PTR(Expr) VarExpr::subst(string str, PTR(Expr) e){
+//    if(val==str){
+//        return e;
+//    }
+//    else {
+//        return THIS;
+//    }
+//}
 
 /**
  * \brief Prints the variable's name to the provided output stream.
@@ -337,11 +343,17 @@ bool LetExpr::equals(PTR(Expr) e){
  * \brief Interprets the Let expression by evaluating rhs, substituting it into body, and then evaluating the result.
  * \return The integer result of interpreting the Let expression.
  */
-PTR(Val) LetExpr::interp(){
+PTR(Val) LetExpr::interp(PTR(Env) env){
     
-    PTR(Val) rhsValue = rhs->interp();
+    if(env == nullptr) {
+        env = Env::empty;
+    }
     
-    return body->subst(lhs, rhsValue->to_expr())->interp();
+    PTR(Val) rhsValue = this->rhs->interp(env);
+    
+    PTR(Env) new_env = NEW(ExtendedEnv)(lhs, rhsValue, env);
+    
+    return body->interp(new_env);
 }
 
 /**
@@ -350,17 +362,17 @@ PTR(Val) LetExpr::interp(){
  * \param e The expression to replace str with.
  * \return A new Let expression with the substitution made.
  */
-PTR(Expr) LetExpr::subst(string str, PTR(Expr) e){
-    // Check if the variable to substitute is the same as the Let's lhs
-       if (lhs == str) {
-           // If yes, do not substitute within the body, as the Let's variable shadows it
-           return NEW(LetExpr)(lhs, rhs->subst(str, e), body) ;
-       }
-       else {
-           // If not, substitute within both rhs and body
-           return NEW(LetExpr)(lhs, rhs->subst(str, e), body->subst(str, e));
-       }
-}
+//PTR(Expr) LetExpr::subst(string str, PTR(Expr) e){
+//    // Check if the variable to substitute is the same as the Let's lhs
+//       if (lhs == str) {
+//           // If yes, do not substitute within the body, as the Let's variable shadows it
+//           return NEW(LetExpr)(lhs, rhs->subst(str, e), body) ;
+//       }
+//       else {
+//           // If not, substitute within both rhs and body
+//           return NEW(LetExpr)(lhs, rhs->subst(str, e), body->subst(str, e));
+//       }
+//}
 
 /**
  * \brief Prints the Let expression to the provided output stream in a specific format.
@@ -418,13 +430,13 @@ bool BoolExpr::equals (PTR(Expr) e){
     return this->val == boolPtr->val;
 }
 
-PTR(Val) BoolExpr::interp(){
+PTR(Val) BoolExpr::interp(PTR(Env) env){
     return NEW( BoolVal)(val) ;
 }
 
-PTR(Expr) BoolExpr::subst(string str, PTR(Expr) e){
-    return THIS;
-}
+//PTR(Expr) BoolExpr::subst(string str, PTR(Expr) e){
+//    return THIS;
+//}
 
 void BoolExpr::print(ostream &ostream){
     if(val){
@@ -462,19 +474,22 @@ bool IfExpr::equals (PTR(Expr) e){
     return this->if_->equals(ifPtr->if_) && this->then_->equals(ifPtr->then_) && this->else_->equals(ifPtr->else_);
 }
 
-PTR(Val) IfExpr::interp(){
-    PTR(Val) conditionValue = if_->interp();
+PTR(Val) IfExpr::interp(PTR(Env) env){
+    if(env == nullptr) {
+        env = Env::empty;
+    }
+    PTR(Val) conditionValue = if_->interp(env);
     PTR(BoolVal) boolCondition = CAST(BoolVal)(conditionValue);
     if (boolCondition != nullptr && boolCondition->is_true()) {
-        return then_->interp();
+        return then_->interp(env);
     } else {
-        return else_->interp();
+        return else_->interp(env);
     }
 }
 
-PTR(Expr) IfExpr::subst(string str, PTR(Expr) e){
-    return NEW(IfExpr)(this->if_->subst(str, e),this->then_->subst(str, e), this->else_->subst(str, e)) ;
-}
+//PTR(Expr) IfExpr::subst(string str, PTR(Expr) e){
+//    return NEW(IfExpr)(this->if_->subst(str, e),this->then_->subst(str, e), this->else_->subst(str, e)) ;
+//}
 
 void IfExpr::print(ostream &ostream){
     ostream << "(" << "_if";
@@ -536,13 +551,16 @@ bool EqExpr::equals (PTR(Expr) e){
     return this->rhs->equals(eqPtr->rhs) && this->lhs->equals(eqPtr->lhs);
 }
 
-PTR(Val) EqExpr::interp(){
-   return NEW(BoolVal)(rhs->interp()->equals(lhs->interp()));
+PTR(Val) EqExpr::interp(PTR(Env) env){
+    if(env == nullptr) {
+        env = Env::empty;
+    }
+   return NEW(BoolVal)(rhs->interp(env)->equals(lhs->interp(env)));
 }
 
-PTR(Expr) EqExpr::subst(string str, PTR(Expr) e){
-    return NEW(EqExpr)(this->rhs->subst(str, e), this->lhs->subst(str, e));
-}
+//PTR(Expr) EqExpr::subst(string str, PTR(Expr) e){
+//    return NEW(EqExpr)(this->rhs->subst(str, e), this->lhs->subst(str, e));
+//}
 
 void EqExpr::print(ostream &ostream){
     ostream << "(";
@@ -585,20 +603,23 @@ bool FunExpr::equals (PTR(Expr)e){
     return this->formal_arg == funPtr->formal_arg && this->body->equals(funPtr->body);
 }
 
-PTR(Val) FunExpr::interp(){
-    return NEW( FunVal)(formal_arg, body);
+PTR(Val) FunExpr::interp(PTR(Env) env){
+    if(env == nullptr) {
+        env = Env::empty;
+    }
+    return NEW( FunVal)(formal_arg, body, env);
 }
 
-PTR(Expr) FunExpr::subst(string str, PTR(Expr) e){
-    if(formal_arg == str){
-        // Return the function as is, no substitution needed
-        return THIS;
-    }
-    else{
-        // Proceed with substitution in the body if the formal argument doesn't match
-        return NEW( FunExpr)(formal_arg, body->subst(str, e));
-    }
-}
+//PTR(Expr) FunExpr::subst(string str, PTR(Expr) e){
+//    if(formal_arg == str){
+//        // Return the function as is, no substitution needed
+//        return THIS;
+//    }
+//    else{
+//        // Proceed with substitution in the body if the formal argument doesn't match
+//        return NEW( FunExpr)(formal_arg, body->subst(str, e));
+//    }
+//}
 
 void FunExpr::print(ostream &ostream){
     ostream << "_fun (" << this->formal_arg << ") " << this->body->to_string();
@@ -624,13 +645,16 @@ bool CallExpr::equals (PTR(Expr) e){
     return this->to_be_called->equals(callPtr->to_be_called) && this->actual_arg->equals(callPtr->actual_arg);
 }
 
-PTR(Val) CallExpr::interp(){
-    return this->to_be_called->interp()->call(this->actual_arg->interp());
+PTR(Val) CallExpr::interp(PTR(Env) env){
+    if(env == nullptr) {
+        env = Env::empty;
+    }
+    return this->to_be_called->interp(env)->call(this->actual_arg->interp(env));
 }
 
-PTR(Expr) CallExpr::subst(string str, PTR(Expr) e){
-    return NEW(CallExpr)(this->to_be_called->subst(str, e), this->actual_arg->subst(str, e));
-}
+//PTR(Expr) CallExpr::subst(string str, PTR(Expr) e){
+//    return NEW(CallExpr)(this->to_be_called->subst(str, e), this->actual_arg->subst(str, e));
+//}
 
 void CallExpr::print(ostream &ostream){
     ostream << "(" << this->to_be_called->to_string() << ") (" << this->actual_arg->to_string() << ")";

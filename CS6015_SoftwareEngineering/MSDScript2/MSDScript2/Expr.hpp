@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <sstream>
 #include "pointer.h"
+#include "env.hpp"
 
 using namespace std;
 class Val;
@@ -31,8 +32,8 @@ typedef enum {
 CLASS(Expr) {
 public:
     virtual bool equals (PTR(Expr) e)=0;
-    virtual PTR(Val) interp()=0;
-    virtual PTR(Expr) subst(string str, PTR(Expr) e)=0;
+    virtual PTR(Val) interp(PTR(Env) env = nullptr)=0;
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e)=0;
     virtual void print(ostream &ostream)=0;
     string to_string();
     
@@ -52,8 +53,8 @@ public:
     
     AddExpr(PTR(Expr) lhs, PTR(Expr) rhs);
     virtual bool equals(PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
 };
@@ -68,8 +69,8 @@ public:
     MultExpr(PTR(Expr) lhs, PTR(Expr) rhs);
 
     virtual bool equals(PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print (ostream &ostream);
     void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
 };
@@ -82,8 +83,8 @@ public:
     
     NumExpr(int rep);
     virtual bool equals(PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print (ostream &ostream);
 };
 
@@ -96,8 +97,8 @@ public:
     
     VarExpr (string val);
     virtual bool equals(PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print (ostream &ostream);
 };
 
@@ -112,8 +113,8 @@ public:
     
     LetExpr(string lhs, PTR(Expr) rhs, PTR(Expr) body);
     virtual bool equals(PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
 };
@@ -126,8 +127,8 @@ public:
     
     BoolExpr(bool b);
     virtual bool equals (PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
@@ -143,8 +144,8 @@ public:
     
     IfExpr(PTR(Expr) if_, PTR(Expr) then_, PTR(Expr) else_);
     virtual bool equals (PTR(Expr)e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
@@ -159,8 +160,8 @@ public:
     
     EqExpr(PTR(Expr) rhs, PTR(Expr) lhs);
     virtual bool equals (PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
@@ -175,8 +176,8 @@ public:
     
     FunExpr(string formal_arg, PTR(Expr)body);
     virtual bool equals (PTR(Expr)e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);
@@ -191,8 +192,8 @@ public:
     
     CallExpr(PTR(Expr) to_be_called, PTR(Expr) actual_arg);
     virtual bool equals (PTR(Expr) e);
-    virtual PTR(Val) interp();
-    virtual PTR(Expr) subst(string str, PTR(Expr) e);
+    virtual PTR(Val) interp(PTR(Env) env = nullptr);
+//    virtual PTR(Expr) subst(string str, PTR(Expr) e);
     virtual void print(ostream &ostream);
     
     virtual void pretty_print_at(ostream &ostream, precedence_t prec, bool let_parent, streampos &strmpos);

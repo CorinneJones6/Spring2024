@@ -15,6 +15,7 @@
 #include "Val.hpp"
 #include "catch.h"
 #include "parse.hpp"
+#include "env.hpp"
 
 
 TEST_CASE("NUM TESTS"){
@@ -33,10 +34,6 @@ TEST_CASE("NUM TESTS"){
         CHECK( (NEW( NumExpr)(-1))->interp()->equals(NEW(NumVal)(-1))); //check this one
         CHECK( (NEW( NumExpr)(0))->interp()->equals(NEW(NumVal)(0)) );
         CHECK( (NEW( NumExpr)(INT_MAX))->interp()->equals(NEW(NumVal)(INT_MAX)) );
-    }
-    
-    SECTION("Testing subst()"){
-        //tested in other tests
     }
     
     SECTION("Testing to_string()"){
@@ -67,11 +64,11 @@ TEST_CASE("ADD TESTS"){
               ->interp()->equals(NEW(NumVal)(600)));
     }
     
-    SECTION("Testing subst()"){
-        CHECK( (NEW(AddExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(7)))
-              ->subst("x", NEW(VarExpr)("y"))
-              ->equals(NEW(AddExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(7))) );
-    }
+//    SECTION("Testing subst()"){
+//        CHECK( (NEW(AddExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(7)))
+//              ->subst("x", NEW(VarExpr)("y"))
+//              ->equals(NEW(AddExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(7))) );
+//    }
     
     SECTION("Testing to_string()"){
         CHECK( (NEW(AddExpr)(NEW(NumExpr)(5), NEW(NumExpr)(3)))->to_string() == "(5+3)" );
@@ -105,14 +102,14 @@ TEST_CASE("MULT TESTS"){
               ->interp()->equals(NEW(NumVal)(-1)));
     }
     
-    SECTION("Testing subst()"){
-        CHECK( (NEW(MultExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(7)))
-              ->subst("x", NEW(VarExpr)("y"))
-              ->equals(NEW(MultExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(7))) );
-        CHECK( (NEW(VarExpr)("x"))
-              ->subst("x", NEW(MultExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7)))
-              ->equals(NEW(MultExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7))) );
-    }
+//    SECTION("Testing subst()"){
+//        CHECK( (NEW(MultExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(7)))
+//              ->subst("x", NEW(VarExpr)("y"))
+//              ->equals(NEW(MultExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(7))) );
+//        CHECK( (NEW(VarExpr)("x"))
+//              ->subst("x", NEW(MultExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7)))
+//              ->equals(NEW(MultExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7))) );
+//    }
     
     SECTION("Testing to_string()"){
         CHECK( (NEW(MultExpr)(NEW(NumExpr)(6), NEW(NumExpr)(7)))->to_string() == "(6*7)" );
@@ -130,17 +127,17 @@ TEST_CASE("VAR TESTS"){
         CHECK(( NEW(VarExpr)("c"))->equals(var2)==false );
     }
     
-    SECTION("Testing interp()"){
-        CHECK_THROWS_WITH( (NEW(VarExpr)("x"))->interp(), "Var cannot be converted to a number" );
-    }
+//    SECTION("Testing interp()"){
+//        CHECK_THROWS_WITH( (NEW(VarExpr)("x"))->interp(), "Var cannot be converted to a number" );
+//    }
     
-    SECTION("Testing subst()"){
-        CHECK( (NEW(VarExpr)("x"))
-              ->subst("x", NEW(AddExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7)))
-              ->equals(NEW(AddExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7))) );
-        PTR(VarExpr) var = NEW(VarExpr)("x");
-        CHECK( (var)->subst("y", NEW(NumExpr)(42)) == var );
-    }
+//    SECTION("Testing subst()"){
+//        CHECK( (NEW(VarExpr)("x"))
+//              ->subst("x", NEW(AddExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7)))
+//              ->equals(NEW(AddExpr)(NEW(VarExpr)("y"),NEW(NumExpr)(7))) );
+//        PTR(VarExpr) var = NEW(VarExpr)("x");
+//        CHECK( (var)->subst("y", NEW(NumExpr)(42)) == var );
+//    }
     
     SECTION("Testing to_string()"){
         CHECK( (NEW(VarExpr)("x"))->to_string() == "x" );
@@ -186,22 +183,22 @@ TEST_CASE("LET TESTS"){
         CHECK( (NEW(LetExpr)("x", num5, addExpr))->interp()->equals(NEW(NumVal)(7)) );
     }
     
-    SECTION("Testing subst()"){
-        //Substitution in rhs, not shadowed by Let's lhs
-        PTR(LetExpr) letExpr = NEW(LetExpr)("x", NEW(AddExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(1)), NEW(VarExpr)("x"));
-        PTR(Expr) substituted = letExpr->subst("y", NEW(NumExpr)(5));
-        CHECK( substituted->equals(NEW(LetExpr)("x", NEW(AddExpr)(NEW(NumExpr)(5), NEW(NumExpr)(1)), NEW(VarExpr)("x"))) == true );
-        
-        //Substitution shadowed by Let's lhs
-        PTR(LetExpr) letExpr1 = NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(3)));
-        PTR(Expr) substituted1 = letExpr1->subst("x", NEW(NumExpr)(10));
-        CHECK( substituted1->equals(NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(3)))) == true );
-        
-        //Substitution in body, not shadowed
-        PTR(LetExpr) letExpr2 = NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(3)));
-        PTR(Expr) substituted2 = letExpr2->subst("y", NEW(NumExpr)(2));
-        CHECK( substituted2->equals(NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(NumExpr)(2), NEW(NumExpr)(3)))) == true );
-    }
+//    SECTION("Testing subst()"){
+//        //Substitution in rhs, not shadowed by Let's lhs
+//        PTR(LetExpr) letExpr = NEW(LetExpr)("x", NEW(AddExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(1)), NEW(VarExpr)("x"));
+//        PTR(Expr) substituted = letExpr->subst("y", NEW(NumExpr)(5));
+//        CHECK( substituted->equals(NEW(LetExpr)("x", NEW(AddExpr)(NEW(NumExpr)(5), NEW(NumExpr)(1)), NEW(VarExpr)("x"))) == true );
+//
+//        //Substitution shadowed by Let's lhs
+//        PTR(LetExpr) letExpr1 = NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(3)));
+//        PTR(Expr) substituted1 = letExpr1->subst("x", NEW(NumExpr)(10));
+//        CHECK( substituted1->equals(NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(VarExpr)("x"), NEW(NumExpr)(3)))) == true );
+//
+//        //Substitution in body, not shadowed
+//        PTR(LetExpr) letExpr2 = NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(VarExpr)("y"), NEW(NumExpr)(3)));
+//        PTR(Expr) substituted2 = letExpr2->subst("y", NEW(NumExpr)(2));
+//        CHECK( substituted2->equals(NEW(LetExpr)("x", NEW(NumExpr)(5), NEW(AddExpr)(NEW(NumExpr)(2), NEW(NumExpr)(3)))) == true );
+//    }
     
     SECTION("Testing print()"){
         ostringstream out;
@@ -575,18 +572,18 @@ TEST_CASE("Testing IfExpr") {
         CHECK( (NEW(IfExpr)(NEW(BoolExpr)(true), NEW(NumExpr)(1), NEW(NumExpr)(2)))->interp()->equals(NEW(NumVal)(1)) );
     }
 
-    SECTION("Testing subst()") {
-        PTR(Expr) condition = NEW(VarExpr)("x");
-        PTR(Expr) thenBranch = NEW(NumExpr)(1);
-        PTR(Expr) elseBranch = NEW(NumExpr)(2);
-        PTR(IfExpr) ifExpr = NEW(IfExpr)(condition, thenBranch, elseBranch);
-
-        PTR(Expr) substituted = ifExpr->subst("x", NEW(BoolExpr)(true));
-
-        CHECK(CAST(IfExpr)(substituted) != nullptr);
-        PTR(IfExpr) substIfExpr = CAST(IfExpr)(substituted);
-        CHECK(substIfExpr->if_ != condition); // Ensure the condition has been substituted
-    }
+//    SECTION("Testing subst()") {
+//        PTR(Expr) condition = NEW(VarExpr)("x");
+//        PTR(Expr) thenBranch = NEW(NumExpr)(1);
+//        PTR(Expr) elseBranch = NEW(NumExpr)(2);
+//        PTR(IfExpr) ifExpr = NEW(IfExpr)(condition, thenBranch, elseBranch);
+//
+//        PTR(Expr) substituted = ifExpr->subst("x", NEW(BoolExpr)(true));
+//
+//        CHECK(CAST(IfExpr)(substituted) != nullptr);
+//        PTR(IfExpr) substIfExpr = CAST(IfExpr)(substituted);
+//        CHECK(substIfExpr->if_ != condition); // Ensure the condition has been substituted
+//    }
 
 
     SECTION("Testing print()") {
@@ -660,17 +657,17 @@ TEST_CASE("Testing EqExpr") {
         CHECK((testExpr3->interp())->to_string() == "_true");
     }
 
-    SECTION("Testing subst()") {
-        PTR(Expr) lhs = NEW(VarExpr)("x");
-        PTR(Expr) rhs = NEW(NumExpr)(1);
-        PTR(EqExpr) eqExpr = NEW(EqExpr)(lhs, rhs);
-
-        PTR(Expr) substituted = eqExpr->subst("x", NEW(NumExpr)(2));
-
-        CHECK(CAST(EqExpr)(substituted) != nullptr);
-        PTR(EqExpr) substEqExpr = CAST(EqExpr)(substituted);
-        CHECK(substEqExpr->lhs != lhs); // Ensure the lhs has been substituted
-    }
+//    SECTION("Testing subst()") {
+//        PTR(Expr) lhs = NEW(VarExpr)("x");
+//        PTR(Expr) rhs = NEW(NumExpr)(1);
+//        PTR(EqExpr) eqExpr = NEW(EqExpr)(lhs, rhs);
+//
+//        PTR(Expr) substituted = eqExpr->subst("x", NEW(NumExpr)(2));
+//
+//        CHECK(CAST(EqExpr)(substituted) != nullptr);
+//        PTR(EqExpr) substEqExpr = CAST(EqExpr)(substituted);
+//        CHECK(substEqExpr->lhs != lhs); // Ensure the lhs has been substituted
+//    }
 
     SECTION("Testing print()") {
         ostringstream output;

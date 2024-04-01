@@ -102,9 +102,13 @@ PTR(Val) BoolVal::call(PTR(Val) actual_arg){
 
 //======================  FunVal  ======================//
 
-FunVal::FunVal(string formal_arg, PTR(Expr) body){
+FunVal::FunVal(string formal_arg, PTR(Expr) body, PTR(Env) env){
+    if(env == nullptr) {
+           env = Env::empty;
+       }
     this->formal_arg = formal_arg;
-    this->body = body; 
+        this->body = body;
+        this->env = env;
 }
 
 PTR(Expr) FunVal::to_expr(){
@@ -137,8 +141,7 @@ bool FunVal::is_true(){
 }
 
 PTR(Val) FunVal::call(PTR(Val) actual_arg){
-    PTR(Expr) actualExpr = actual_arg->to_expr();
-    
-    return body->subst(formal_arg, actualExpr)->interp();
+
+    return this->body->interp(NEW(ExtendedEnv)(this->formal_arg, actual_arg, this->env));
     
 }

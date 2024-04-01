@@ -73,8 +73,9 @@ class FunVal : public Val {
 public: 
     string formal_arg;
     PTR(Expr) body;
+    PTR(Env) env;
     
-    FunVal(string formal_arg, PTR(Expr) body);
+    FunVal(string formal_arg, PTR(Expr) body, PTR(Env) env = nullptr);
     
     virtual PTR(Expr) to_expr();
     virtual bool equals (PTR(Val) v);
