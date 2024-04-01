@@ -1,5 +1,3 @@
-#pragma once
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Author: Corinne Jones
@@ -7,9 +5,11 @@
 //
 // CS 6013
 //
-// Outline for SerialQueue class.  Fill in the missing data, comments, etc.
+// Outline for SerialQueue class was provided. Missing data was completed. 
 //
 ////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 template <typename T>
 class SerialQueue {

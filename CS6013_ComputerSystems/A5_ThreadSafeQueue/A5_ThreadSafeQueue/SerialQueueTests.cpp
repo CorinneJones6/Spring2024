@@ -1,4 +1,3 @@
-#pragma once
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -7,7 +6,7 @@
 //
 // CS 6013
 //
-// Tests for SerialQueue class.  Fill in the missing data, comments, etc.
+// Tests for SerialQueue class.  
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -16,10 +15,8 @@
 
 using namespace std;
 
-void testStaticAllocation() {
+bool testStaticAllocation() {
     SerialQueue<int> queue;
-
-    cout << "Testing static allocation... ";
     
     queue.enqueue(1);
     queue.enqueue(2);
@@ -28,30 +25,26 @@ void testStaticAllocation() {
     bool dequeued = queue.dequeue(&result);
 
     if (!dequeued || result != 1 || queue.size() != 1) {
-        cerr << "Static allocation test failed.\n";
-        exit(1);
+        return false;
     }
 
-    cout << "Passed\n";
+    return true;
 }
 
-void testDynamicAllocationAndDeallocation() {
-    std::cout << "Testing dynamic allocation and deallocation... ";
+bool testDynamicAllocationAndDeallocation() {
     SerialQueue<int>* queue = new SerialQueue<int>();
 
-    // Perform operations
     queue->enqueue(1);
     queue->enqueue(2);
 
-    delete queue; // Test for memory leaks or errors upon deletion
+    delete queue;
 
-    cout << "Passed\n";
+    return true;
 }
 
-void testEnqueueDequeue() {
-    SerialQueue<std::string> queue;
+bool testEnqueueDequeue() {
+    SerialQueue<string> queue;
 
-    cout << "Testing enqueue and dequeue... ";
     queue.enqueue("First");
     queue.enqueue("Second");
 
@@ -60,18 +53,36 @@ void testEnqueueDequeue() {
     bool dequeuedSecond = queue.dequeue(&result);
 
     if (!dequeuedFirst || result != "Second" || !dequeuedSecond || queue.size() != 0) {
-        std::cerr << "Enqueue/Dequeue test failed.\n";
-        exit(1);
+        return false;
     }
 
-    cout << "Passed\n";
+    return true;
 }
 
 int main(int argc, const char * argv[]) {
     
-    testStaticAllocation();
-    testDynamicAllocationAndDeallocation();
-    testEnqueueDequeue();
+    if(testStaticAllocation()){
+
+        cout << "Static allocation test PASSED" << endl;
+    }
+    else {
+        cerr << "Static allocation test FAILED" << endl;
+    }
+    
+    if(testDynamicAllocationAndDeallocation()){
+
+        cout << "Dynamic Allocation/Deallocation test PASSED" << endl;
+    }
+    else {
+        cerr << "Dynamic Allocation/Deallocation test FAILED" << endl;
+    }
+    
+    if(testEnqueueDequeue()){
+        cout << "Enqueue/Dequeue test PASSED" << endl;
+    }
+    else {
+        cerr << "Enqueue/Dequeue test FAILED" << endl;
+    }
     
     return 0;
 }
