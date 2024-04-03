@@ -86,5 +86,5 @@ private:
     Node * tail_;
     int    size_;
     
-    std::mutex m_;
+    mutex m_;
 };
