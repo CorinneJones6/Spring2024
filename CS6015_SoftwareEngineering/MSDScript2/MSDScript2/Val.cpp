@@ -104,11 +104,11 @@ PTR(Val) BoolVal::call(PTR(Val) actual_arg){
 
 FunVal::FunVal(string formal_arg, PTR(Expr) body, PTR(Env) env){
     if(env == nullptr) {
-           env = Env::empty;
-       }
+        env = Env::empty;
+    }
     this->formal_arg = formal_arg;
-        this->body = body;
-        this->env = env;
+    this->body = body;
+    this->env = env;
 }
 
 PTR(Expr) FunVal::to_expr(){
