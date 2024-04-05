@@ -1,15 +1,19 @@
-////////////////////////////////////////////////////////////////////////
-//
-// Author: Corinne Jones
-// Date: 4/1/24
-//
-// CS 6013
-//
-// Tests for ConcurrentQueue class.
-// 1. Compile via Cmdline: clang++ -std=c++17 ConcurrentQueueTests.cpp -o executable
-// 2. Run executable: ./executable <num1><num1><num3>
-//
-////////////////////////////////////////////////////////////////////////
+
+/**
+ * @file ConcurrentQueueTests.cpp
+ * @brief Tests for the ConcurrentQueue class.
+ *
+ * Provides a set of tests to verify the thread safety of the ConcurrentQueue class.
+ * These tests include multiple producers and consumers to simulate concurrent access to the queue.
+ *
+ * Instructions for compiling and running:
+ * 1. Compile via Cmdline: clang++ -std=c++17 ConcurrentQueueTests.cpp -o executable
+ * 2. Run executable: ./executable <num_producers> <num_consumers> <num_ints>
+ *
+ * @author Corinne Jones
+ * @date 4/1/24
+ * @course CS 6013
+ */
 
 #include <iostream>
 #include <thread>
@@ -31,6 +35,18 @@ void consumerAction(ConcurrentQueue<int>& queue, int numInts) {
     }
 }
 
+/**
+ * @brief Tests the ConcurrentQueue with a specified number of producers and consumers.
+ *
+ * This function initializes a ConcurrentQueue and spawns a number of producer and consumer threads.
+ * Each producer thread enqueues a set number of integers, and each consumer thread dequeues a set number of integers.
+ * The function then waits for all threads to complete and checks if the final size of the queue is as expected.
+ *
+ * @param num_producers The number of producer threads to create.
+ * @param num_consumers The number of consumer threads to create.
+ * @param num_ints The number of integers each producer/consumer will enqueue/dequeue.
+ * @return true if the final size of the queue matches the expected value, false otherwise.
+ */
 bool testQueue( int num_producers, int num_consumers, int num_ints ) {
 
     vector<thread> threads;
@@ -46,10 +62,10 @@ bool testQueue( int num_producers, int num_consumers, int num_ints ) {
          threads.push_back(thread(producerAction, ref(queue), num_ints));
      }
 
-     // Create num_consumer consumer threads that dequeue num_ints ints from the ConcurrentQueue
-     for (int i = 0; i < num_consumers; ++i) {
+    // Create num_consumer consumer threads that dequeue num_ints ints from the ConcurrentQueue
+    for (int i = 0; i < num_consumers; ++i) {
          threads.push_back(thread(consumerAction, ref(queue), num_ints));
-     }
+    }
 
     //Wait for all threads to join
     for(thread& thread : threads){
