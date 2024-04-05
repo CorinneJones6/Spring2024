@@ -7,7 +7,7 @@
  * @tparam T Type of the elements stored in the queue.
  * @note This class uses mutexes and locks for thread safety.
  * @author Corinne Jones
- * @date 3/18/24
+ * @date 4/1/24
  * @course CS 6013
  *
  */
