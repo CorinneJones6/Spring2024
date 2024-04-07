@@ -63,11 +63,7 @@ class EncFS(Operations):
 	    #Create an empty dictionary to store in memfiles
         self.inMemoryFiles = {}
 	    #Use getpass to read in password 
-        # self.password = getpass.getpass('Enter the password: ')
-        #Hardcoded password used for testing 
-        self.password = "password"
-        
-	
+        self.password = getpass.getpass('Enter the password: ')
         
     def destroy(self, path):
         """Clean up any resources used by the filesystem.
@@ -501,7 +497,7 @@ class EncFS(Operations):
    '''         
     def encrypt (self, content):   
         
-        salt = os.random(16)
+        salt = os.urandom(16)
 
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
@@ -564,16 +560,16 @@ class EncFS(Operations):
         """
         return self.flush(path, fh)
 '''
-# if __name__ == '__main__':
-#     from sys import argv
-#     if len(argv) != 3:
-#         print('usage: %s <encrypted folder> <mountpoint>' % argv[0])
-#         exit(1)
+if __name__ == '__main__':
+    from sys import argv
+    if len(argv) != 3:
+        print('usage: %s <encrypted folder> <mountpoint>' % argv[0])
+        exit(1)
 
-#     logging.basicConfig(level=logging.DEBUG)
-#     #create our virtual filesystem using argv[1] as the physical filesystem
-#     #and argv[2] as the virtual filesystem
-#     fuse = FUSE(EncFS(argv[1]), argv[2], foreground=True)
+    logging.basicConfig(level=logging.DEBUG)
+    #create our virtual filesystem using argv[1] as the physical filesystem
+    #and argv[2] as the virtual filesystem
+    fuse = FUSE(EncFS(argv[1]), argv[2], foreground=True)
 
 # if __name__ == '__main__':
 #     logging.basicConfig(level=logging.DEBUG)
@@ -622,24 +618,3 @@ class EncFS(Operations):
 #     bytes_read = my_encfs.read(test_file_path, 3, 6, fh=None)
 
 #     print("Bytes read:", bytes_read)
-
-
-if __name__ == '__main__':
-    # Assuming you've created a 'test_dir' directory for testing
-    test_root = '/Users/corinnejones/GitHubSchool/Spring2024/CS6014_Networks&Security/FinalProject_EncryptedFilesystem/EncryptedFilesystem'  # Update this to your test directory path
-    my_fs = EncFS(test_root)
-    
-    # Test file paths
-    plaintext_path = 'plaintext.txt'
-    encrypted_path = 'testFile.txt'  # The path where encrypted content will be stored
-
-    # Read plaintext data (simulating file content to encrypt)
-    with open(os.path.join(test_root, plaintext_path), 'rb') as file:
-        plaintext_data = file.read()
-
-    # Encrypt and store data (simulate writing to an encrypted filesystem)
-    fd = my_fs.create(encrypted_path, 0o666)  # Simulate creating an encrypted file
-    my_fs.write(encrypted_path, plaintext_data, 0, fd)  # Write (encrypt) data
-    my_fs.release(encrypted_path, fd)  # Simulate closing the file, triggering encryption
-    
-    print("Encryption test completed. Check the encrypted file content manually.")
