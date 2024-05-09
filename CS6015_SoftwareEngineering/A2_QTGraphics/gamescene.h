@@ -3,7 +3,6 @@
 #include <QGraphicsScene>
 #include "bucket.h"
 #include "droplet.h"
-#include "cloud.h"
 
 class GameScene: public QGraphicsScene
 {

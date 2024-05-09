@@ -4,34 +4,37 @@
 #include <QGraphicsView>
 
 #include "gamescene.h" //customized graphics scene
+#include "login.h"
 
-int main (int argc, char **argv) {
+int main(int argc, char **argv) {
+    QApplication app(argc, argv);
 
-    QApplication app (argc, argv);
+    login l;  // Create an instance of the login window
 
-    int width = 910;
-    int height = 650;
+    // Connect the guestLoggedIn signal to a lambda that sets up and shows the main graphics view
+    QObject::connect(&l, &login::guestLoggedIn, [&]() {
+        int width = 910;
+        int height = 650;
 
-    //scene --> QGraphicScene
-    //create our customized graphics scene
+        // Create the custom game scene
+        GameScene *gameScene = new GameScene();
 
-    GameScene *gameScene = new GameScene();
+        // Create the view to display the scene
+        QGraphicsView *mainView = new QGraphicsView();
+        mainView->setScene(gameScene);
 
-    //create a view --> QGraphicsView
-    QGraphicsView *mainView = new QGraphicsView();
+        // Configure the view's properties
+        mainView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        mainView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        mainView->setFixedSize(width, height);
 
-    //add the scene to the view --> set Scene
-    mainView->setScene(gameScene);
+        // Show the view
+        mainView->show();
+    });
 
-    // Disable scroll bars
-    mainView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    mainView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // Show the login window
+    l.show();
 
-    //To fix the view window size and prevent it from ever growing or shrinking
-    mainView->setFixedSize(width, height);
-
-    //show the view -->show
-    mainView->show();
-
+    // Start the Qt event loop
     return app.exec();
 }

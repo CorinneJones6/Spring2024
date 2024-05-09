@@ -4,6 +4,7 @@ SOURCES += \
     bucket.cpp \
     droplet.cpp \
     gamescene.cpp \
+    login.cpp \
     main.cpp
 
 RESOURCES += \
@@ -12,4 +13,5 @@ RESOURCES += \
 HEADERS += \
     bucket.h \
     droplet.h \
-    gamescene.h
+    gamescene.h \
+    login.h
